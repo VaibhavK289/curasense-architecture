@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: curasense-vision
+  labels:
+    app: backend-vision
+spec:
+  replicas: 1 # Vision parsing is often heavy; start with 1 on Minikube
+  selector:
+    matchLabels:
+      app: backend-vision
+  template:
+    metadata:
+      labels:
+        app: backend-vision
+    spec:
+      containers:
+      - name: vision-api
+        image: curasense_diagnosis_ml_model-backend-vision:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8001
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /docs # Standard FastAPI docs route for health check
+            port: 8001
+          initialDelaySeconds: 30
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: curasense-vision-service
+spec:
+  type: ClusterIP # Internal only; no need to expose vision to user directly
+  selector:
+    app: backend-vision
+  ports:
+    - protocol: TCP
+      port: 8001
+      targetPort: 8001

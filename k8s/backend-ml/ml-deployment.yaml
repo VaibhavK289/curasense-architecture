@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: curasense-ml
+  labels:
+    app: backend-ml
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend-ml
+  template:
+    metadata:
+      labels:
+        app: backend-ml
+    spec:
+      containers:
+      - name: ml-logic
+        image: curasense_diagnosis_ml_model-backend-ml:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        env:
+        # Crucial: This is how ML service knows where the Vision service is
+        - name: VISION_API_URL
+          value: "http://curasense-vision-service:8001"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        # Increased timeouts for long-running agents
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 45
+          timeoutSeconds: 10
+      # Wait up to 5 mins for current diagnosis to finish before shutting down
+      terminationGracePeriodSeconds: 300
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: curasense-ml-service
+spec:
+  type: NodePort # Use NodePort for easy Minikube access
+  selector:
+    app: backend-ml
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 30001
