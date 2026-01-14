@@ -1,26 +1,1143 @@
 @import "tailwindcss";
 
+/* ================================================
+   CURASENSE ENTERPRISE DESIGN SYSTEM
+   Healthcare Color Palette with Semantic Meaning
+   ================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand Colors */
+  --brand-primary: 168 84% 40%;
+  --brand-primary-light: 168 84% 50%;
+  --brand-primary-dark: 168 84% 32%;
+  --brand-secondary: 262 83% 58%;
+  --brand-secondary-light: 262 83% 68%;
+  --brand-secondary-dark: 262 83% 48%;
+
+  /* Semantic Colors - Healthcare Specific */
+  --color-success: 142 76% 36%;
+  --color-success-light: 142 76% 90%;
+  --color-success-dark: 142 76% 29%;
+  
+  --color-warning: 38 92% 50%;
+  --color-warning-light: 38 92% 90%;
+  --color-warning-dark: 38 92% 42%;
+  
+  --color-error: 0 84% 60%;
+  --color-error-light: 0 84% 95%;
+  --color-error-dark: 0 84% 50%;
+  
+  --color-info: 201 96% 32%;
+  --color-info-light: 201 96% 90%;
+  --color-info-dark: 201 96% 26%;
+
+  /* Category Colors */
+  --color-diagnosis: 201 96% 32%;
+  --color-imaging: 262 83% 58%;
+  --color-medicine: 142 76% 36%;
+  --color-records: 38 92% 50%;
+
+  /* Neutral Scale */
+  --neutral-0: 0 0% 100%;
+  --neutral-50: 210 40% 98%;
+  --neutral-100: 210 40% 96%;
+  --neutral-200: 214 32% 91%;
+  --neutral-300: 213 27% 84%;
+  --neutral-400: 215 20% 65%;
+  --neutral-500: 215 16% 47%;
+  --neutral-600: 215 19% 35%;
+  --neutral-700: 215 25% 27%;
+  --neutral-800: 217 33% 17%;
+  --neutral-900: 222 47% 11%;
+  --neutral-950: 229 84% 5%;
+
+  /* Surface Colors */
+  --background: 210 40% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  
+  /* Component Colors */
+  --primary: 168 84% 40%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 47% 11%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222 47% 11%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  
+  /* Borders & Inputs */
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 168 84% 40%;
+  
+  /* Radius */
+  --radius: 0.5rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  /* Brand Colors - Brighter for dark mode */
+  --brand-primary: 168 84% 45%;
+  --brand-primary-light: 168 84% 55%;
+  --brand-primary-dark: 168 84% 35%;
+  --brand-secondary: 262 83% 65%;
+  --brand-secondary-light: 262 83% 72%;
+  --brand-secondary-dark: 262 83% 55%;
+
+  /* Semantic Colors - Adjusted for dark backgrounds */
+  --color-success: 142 71% 45%;
+  --color-success-light: 142 76% 15%;
+  --color-success-dark: 142 76% 36%;
+  
+  --color-warning: 38 92% 55%;
+  --color-warning-light: 38 92% 15%;
+  --color-warning-dark: 38 92% 45%;
+  
+  --color-error: 0 84% 60%;
+  --color-error-light: 0 84% 15%;
+  --color-error-dark: 0 84% 50%;
+  
+  --color-info: 199 89% 48%;
+  --color-info-light: 201 96% 15%;
+  --color-info-dark: 201 96% 38%;
+
+  /* Category Colors - Brighter */
+  --color-diagnosis: 199 89% 48%;
+  --color-imaging: 262 83% 65%;
+  --color-medicine: 142 71% 45%;
+  --color-records: 38 92% 55%;
+
+  /* Surface Colors */
+  --background: 229 84% 5%;
+  --foreground: 210 40% 98%;
+  --card: 222 47% 9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222 47% 9%;
+  --popover-foreground: 210 40% 98%;
+  
+  /* Component Colors */
+  --primary: 168 84% 45%;
+  --primary-foreground: 222 47% 11%;
+  --secondary: 217 33% 17%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217 33% 14%;
+  --muted-foreground: 215 20% 65%;
+  --accent: 217 33% 17%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  
+  /* Borders & Inputs */
+  --border: 217 33% 17%;
+  --input: 217 33% 17%;
+  --ring: 168 84% 45%;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ================================================
+   BASE STYLES
+   ================================================ */
+
+* {
+  border-color: hsl(var(--border));
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevent iOS bounce scrolling on body */
+  overscroll-behavior-y: none;
+}
+
+/* ================================================
+   MOBILE-FIRST UTILITIES
+   ================================================ */
+
+/* Safe area padding for iOS devices (notch, home indicator) */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.px-safe {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Touch-friendly tap targets (minimum 44x44px) */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Disable text selection on interactive elements */
+.no-select {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Smooth scrolling for iOS */
+.scroll-smooth-ios {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ================================================
+   SCROLLBAR STYLES
+   ================================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--neutral-300));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--neutral-400));
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: hsl(var(--neutral-700));
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--neutral-600));
+}
+
+/* ================================================
+   SELECTION & FOCUS STYLES - WCAG 2.4.7 Focus Visible
+   ================================================ */
+
+::selection {
+  background: hsl(var(--brand-primary) / 0.2);
+  color: hsl(var(--foreground));
+}
+
+/* Enhanced focus indicators for accessibility */
+:focus-visible {
+  outline: 3px solid hsl(var(--ring));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* High contrast focus for buttons and links */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 3px solid hsl(var(--brand-primary));
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px hsl(var(--brand-primary) / 0.2);
+}
+
+/* Focus within for composite components */
+.focus-within-ring:focus-within {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* ================================================
+   SCREEN READER UTILITIES - WCAG 1.3.1
+   ================================================ */
+
+/* Visually hidden but accessible to screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Make sr-only content visible when focused (for skip links) */
+.sr-only-focusable:focus,
+.sr-only-focusable:active {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* ================================================
+   REDUCED MOTION - WCAG 2.3.3
+   ================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ================================================
+   HIGH CONTRAST MODE SUPPORT
+   ================================================ */
+
+@media (forced-colors: active) {
+  .btn,
+  button,
+  a {
+    border: 2px solid currentColor;
+  }
+  
+  :focus-visible {
+    outline: 3px solid CanvasText;
+    outline-offset: 3px;
+  }
+}
+
+/* ================================================
+   KEYFRAME ANIMATIONS
+   ================================================ */
+
+/* Premium Mesh Gradient Floating Animations */
+@keyframes mesh-float-1 {
+  0%, 100% { 
+    transform: translate(0%, 0%) scale(1) rotate(0deg);
+    opacity: 0.4;
+  }
+  25% { 
+    transform: translate(10%, -15%) scale(1.1) rotate(5deg);
+    opacity: 0.5;
+  }
+  50% { 
+    transform: translate(-5%, 10%) scale(0.95) rotate(-3deg);
+    opacity: 0.45;
+  }
+  75% { 
+    transform: translate(-10%, -5%) scale(1.05) rotate(8deg);
+    opacity: 0.5;
+  }
+}
+
+@keyframes mesh-float-2 {
+  0%, 100% { 
+    transform: translate(0%, 0%) scale(1) rotate(0deg);
+    opacity: 0.35;
+  }
+  33% { 
+    transform: translate(-15%, 10%) scale(1.15) rotate(-8deg);
+    opacity: 0.45;
+  }
+  66% { 
+    transform: translate(10%, -10%) scale(0.9) rotate(5deg);
+    opacity: 0.4;
+  }
+}
+
+@keyframes mesh-float-3 {
+  0%, 100% { 
+    transform: translate(0%, 0%) scale(1) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% { 
+    transform: translate(20%, 15%) scale(1.2) rotate(-10deg);
+    opacity: 0.4;
+  }
+}
+
+@keyframes mesh-float-4 {
+  0%, 100% { 
+    transform: translate(0%, 0%) scale(1);
+    opacity: 0.25;
+  }
+  25% { 
+    transform: translate(-20%, 20%) scale(1.1);
+    opacity: 0.35;
+  }
+  75% { 
+    transform: translate(15%, -15%) scale(0.95);
+    opacity: 0.3;
+  }
+}
+
+/* Aurora/Northern Lights Animation */
+@keyframes aurora-1 {
+  0%, 100% {
+    transform: translateX(0%) skewX(-15deg);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateX(30%) skewX(-15deg);
+    opacity: 0.35;
+  }
+}
+
+@keyframes aurora-2 {
+  0%, 100% {
+    transform: translateX(0%) skewX(15deg);
+    opacity: 0.15;
+  }
+  50% {
+    transform: translateX(-30%) skewX(15deg);
+    opacity: 0.3;
+  }
+}
+
+/* Particle Float Animation */
+@keyframes particle-float {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(20px);
+    opacity: 0;
+  }
+}
+
+/* Twinkle Animation for Stars */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* Subtle Pulse for Glow Effects */
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-5px) rotate(1deg); }
+  50% { transform: translateY(-10px) rotate(0deg); }
+  75% { transform: translateY(-5px) rotate(-1deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 20px hsl(var(--brand-primary) / 0.2);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 40px hsl(var(--brand-primary) / 0.4);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  10% { transform: scale(1.05); }
+  20% { transform: scale(1); }
+  30% { transform: scale(1.08); }
+  40% { transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* NEW: Slide animations for variety */
+@keyframes slide-up {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down {
+  from { 
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-left {
+  from { 
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-right {
+  from { 
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from { 
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes blur-in {
+  from { 
+    opacity: 0;
+    filter: blur(8px);
+  }
+  to { 
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes rotate-in {
+  from { 
+    opacity: 0;
+    transform: rotate(-10deg) scale(0.95);
+  }
+  to { 
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+}
+
+/* Error shake animation */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+/* Success pop animation */
+@keyframes pop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Attention ring animation */
+@keyframes attention-ring {
+  0% { 
+    box-shadow: 0 0 0 0 hsl(var(--brand-primary) / 0.4);
+  }
+  70% { 
+    box-shadow: 0 0 0 10px hsl(var(--brand-primary) / 0);
+  }
+  100% { 
+    box-shadow: 0 0 0 0 hsl(var(--brand-primary) / 0);
+  }
+}
+
+/* Typing cursor animation */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Animation utility classes */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.animate-heartbeat {
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+  background: linear-gradient(
+    90deg,
+    hsl(var(--neutral-200)) 0%,
+    hsl(var(--neutral-100)) 50%,
+    hsl(var(--neutral-200)) 100%
+  );
+  background-size: 200% 100%;
+}
+
+.dark .animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--neutral-800)) 0%,
+    hsl(var(--neutral-700)) 50%,
+    hsl(var(--neutral-800)) 100%
+  );
+  background-size: 200% 100%;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s ease-in-out infinite;
+}
+
+/* NEW animation classes for variety */
+.animate-slide-up {
+  animation: slide-up 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+.animate-slide-down {
+  animation: slide-down 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+.animate-slide-left {
+  animation: slide-left 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+.animate-slide-right {
+  animation: slide-right 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+.animate-blur-in {
+  animation: blur-in 0.4s ease-out forwards;
+}
+
+.animate-rotate-in {
+  animation: rotate-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+.animate-pop {
+  animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-attention {
+  animation: attention-ring 1.5s ease-out infinite;
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Premium background animation classes */
+.animate-mesh-1 {
+  animation: mesh-float-1 25s ease-in-out infinite;
+}
+
+.animate-mesh-2 {
+  animation: mesh-float-2 30s ease-in-out infinite;
+}
+
+.animate-mesh-3 {
+  animation: mesh-float-3 35s ease-in-out infinite;
+}
+
+.animate-mesh-4 {
+  animation: mesh-float-4 28s ease-in-out infinite;
+}
+
+.animate-aurora-1 {
+  animation: aurora-1 15s ease-in-out infinite;
+}
+
+.animate-aurora-2 {
+  animation: aurora-2 18s ease-in-out infinite;
+}
+
+.animate-particle {
+  animation: particle-float 10s linear infinite;
+}
+
+.animate-twinkle {
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+/* Stagger animation delays */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }
+
+/* ================================================
+   SHAPE VARIATIONS - More than just rounded-xl
+   ================================================ */
+
+/* Sharp corners for CTAs - conveys precision */
+.shape-sharp {
+  border-radius: 4px;
+}
+
+/* Soft rounded for cards */
+.shape-soft {
+  border-radius: 12px;
+}
+
+/* Pill shape for badges, tags */
+.shape-pill {
+  border-radius: 9999px;
+}
+
+/* Squircle - iOS style superellipse */
+.shape-squircle {
+  border-radius: 22% / 50%;
+}
+
+/* Asymmetric for visual interest */
+.shape-asymmetric {
+  border-radius: 4px 24px 4px 24px;
+}
+
+.shape-asymmetric-alt {
+  border-radius: 24px 4px 24px 4px;
+}
+
+/* Medical cross shape clip path */
+.shape-cross {
+  clip-path: polygon(
+    35% 0%, 65% 0%, 65% 35%, 100% 35%, 
+    100% 65%, 65% 65%, 65% 100%, 35% 100%, 
+    35% 65%, 0% 65%, 0% 35%, 35% 35%
+  );
+}
+
+/* Capsule/pill shape for medicine */
+.shape-capsule {
+  border-radius: 50px;
+}
+
+/* Hexagon for badges */
+.shape-hexagon {
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+
+/* ================================================
+   PROSE / TYPOGRAPHY
+   ================================================ */
+
+.prose {
+  --tw-prose-headings: hsl(var(--foreground));
+  --tw-prose-body: hsl(var(--foreground));
+  --tw-prose-links: hsl(var(--brand-primary));
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  color: hsl(var(--foreground));
+  font-weight: 600;
+}
+
+.prose a {
+  color: hsl(var(--brand-primary));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ================================================
+   GLASS MORPHISM
+   ================================================ */
+
+.glass {
+  background: hsl(var(--background) / 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-card {
+  background: hsl(var(--card) / 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid hsl(var(--border) / 0.5);
+}
+
+/* ================================================
+   GRADIENT TEXT - Use Sparingly!
+   ================================================ */
+
+.gradient-text-brand {
+  background: linear-gradient(135deg, hsl(var(--brand-primary)), hsl(var(--brand-secondary)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ================================================
+   HEALTHCARE PATTERNS
+   ================================================ */
+
+.health-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2314b8a6' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.dot-pattern {
+  background-image: radial-gradient(hsl(var(--neutral-300)) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.dark .dot-pattern {
+  background-image: radial-gradient(hsl(var(--neutral-700)) 1px, transparent 1px);
+}
+
+/* ================================================
+   STATUS INDICATORS - Semantic Colors
+   ================================================ */
+
+.status-success {
+  background-color: hsl(var(--color-success));
+  color: white;
+}
+
+.status-warning {
+  background-color: hsl(var(--color-warning));
+  color: hsl(222 47% 11%);
+}
+
+.status-error {
+  background-color: hsl(var(--color-error));
+  color: white;
+}
+
+.status-info {
+  background-color: hsl(var(--color-info));
+  color: white;
+}
+
+/* Subtle status backgrounds */
+.status-success-subtle {
+  background-color: hsl(var(--color-success-light));
+  color: hsl(var(--color-success-dark));
+}
+
+.status-warning-subtle {
+  background-color: hsl(var(--color-warning-light));
+  color: hsl(var(--color-warning-dark));
+}
+
+.status-error-subtle {
+  background-color: hsl(var(--color-error-light));
+  color: hsl(var(--color-error-dark));
+}
+
+.status-info-subtle {
+  background-color: hsl(var(--color-info-light));
+  color: hsl(var(--color-info-dark));
+}
+
+/* ================================================
+   SKELETON LOADER
+   ================================================ */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--neutral-200)) 0%,
+    hsl(var(--neutral-100)) 50%,
+    hsl(var(--neutral-200)) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius);
+}
+
+.dark .skeleton {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--neutral-800)) 0%,
+    hsl(var(--neutral-700)) 50%,
+    hsl(var(--neutral-800)) 100%
+  );
+  background-size: 200% 100%;
+}
+
+/* ================================================
+   ENHANCED FOCUS STATES - Accessibility First
+   ================================================ */
+
+/* Base focus ring - visible on keyboard nav only */
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid hsl(var(--brand-primary));
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
+/* Primary focus with glow effect */
+.focus-ring-primary:focus-visible {
+  outline: 2px solid hsl(var(--brand-primary));
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px hsl(var(--brand-primary) / 0.15);
+}
+
+/* Error focus state */
+.focus-ring-error:focus-visible {
+  outline: 2px solid hsl(var(--color-error));
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px hsl(var(--color-error) / 0.15);
+}
+
+/* Success focus state */
+.focus-ring-success:focus-visible {
+  outline: 2px solid hsl(var(--color-success));
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px hsl(var(--color-success) / 0.15);
+}
+
+/* Inset focus for form inputs */
+.focus-ring-inset:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px hsl(var(--brand-primary));
+}
+
+/* Focus within for containers */
+.focus-within-ring:focus-within {
+  outline: 2px solid hsl(var(--brand-primary));
+  outline-offset: 2px;
+}
+
+/* Skip link for keyboard navigation */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  padding: 0.75rem 1.5rem;
+  background: hsl(var(--brand-primary));
+  color: white;
+  border-radius: 0 0 8px 8px;
+  font-weight: 500;
+  transition: top 0.2s ease-in-out;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ================================================
+   EMPTY STATES
+   ================================================ */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.empty-state-icon {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1.5rem;
+  color: hsl(var(--neutral-400));
+  opacity: 0.6;
+}
+
+.dark .empty-state-icon {
+  color: hsl(var(--neutral-500));
+}
+
+.empty-state-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  margin-bottom: 0.5rem;
+}
+
+.empty-state-description {
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+  max-width: 24rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state-action {
+  margin-top: 0.5rem;
+}
+
+/* ================================================
+   INTERACTIVE STATES
+   ================================================ */
+
+/* Hover lift effect */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -8px hsl(var(--neutral-900) / 0.15);
+}
+
+.dark .hover-lift:hover {
+  box-shadow: 0 8px 25px -8px hsl(var(--neutral-900) / 0.4);
+}
+
+/* Hover glow effect */
+.hover-glow {
+  transition: box-shadow 0.2s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px hsl(var(--brand-primary) / 0.3);
+}
+
+/* Press effect */
+.active-press:active {
+  transform: scale(0.98);
+}
+
+/* Disabled state */
+.state-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Loading state overlay */
+.state-loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.state-loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: hsl(var(--background) / 0.7);
+  backdrop-filter: blur(2px);
+  border-radius: inherit;
+}
+
+/* ================================================
+   REDUCED MOTION PREFERENCES
+   ================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .animate-float,
+  .animate-pulse-glow,
+  .animate-heartbeat,
+  .animate-shimmer,
+  .animate-spin-slow,
+  .animate-bounce-subtle,
+  .animate-attention {
+    animation: none !important;
+  }
+}
+
+/* ================================================
+   PRINT STYLES
+   ================================================ */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .glass,
+  .glass-card {
+    backdrop-filter: none !important;
+    background: white !important;
+    border: 1px solid #ccc !important;
+  }
 }
