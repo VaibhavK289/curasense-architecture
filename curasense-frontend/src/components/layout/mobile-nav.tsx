@@ -16,6 +16,7 @@ import {
   X,
   ChevronRight,
   History,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GradientText } from "@/components/ui/aceternity";
@@ -58,6 +59,14 @@ const navigation = [
     color: "text-[hsl(var(--color-records))]",
     activeColor: "text-[hsl(var(--color-records))]",
     activeBg: "bg-[hsl(var(--color-records)/0.1)]",
+  },
+  {
+    name: "Analytics",
+    href: "/analytics",
+    icon: BarChart3,
+    color: "text-[hsl(var(--brand-secondary))]",
+    activeColor: "text-[hsl(var(--brand-secondary))]",
+    activeBg: "bg-[hsl(var(--brand-secondary)/0.1)]",
   },
 ];
 
