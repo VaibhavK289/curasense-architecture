@@ -1,10 +1,10 @@
 // API Configuration
-// In production, these will point to deployed backends
-const FRONTEND_API = process.env.NEXT_PUBLIC_FRONTEND_API || "http://localhost:8000";
+// For X-Ray analysis, we still need direct access to the ML backend
+// For PDF and text diagnosis, we use Next.js API routes as proxies to avoid CORS issues
 const ML_API = process.env.NEXT_PUBLIC_ML_API || "http://localhost:8001";
 
-// Request timeout (90 seconds for slow cold-start)
-const REQUEST_TIMEOUT = 90000;
+// Request timeout (500 seconds for long-running operations)
+const REQUEST_TIMEOUT = 500000;
 
 // Helper function with timeout
 async function fetchWithTimeout(
@@ -39,33 +39,34 @@ export interface ChatResponse {
   model?: string;
 }
 
-// PDF Diagnosis API
+// PDF Diagnosis API - Uses Next.js API route to proxy to backend
+// This avoids CORS issues and keeps the same-origin request pattern
 export async function diagnosePDF(file: File): Promise<DiagnosisResponse> {
   const formData = new FormData();
   formData.append("file", file);
 
   const response = await fetchWithTimeout(
-    `${FRONTEND_API}/diagnose/pdf/`,
+    "/api/diagnose/pdf",
     {
       method: "POST",
       body: formData,
     },
-    180000 // 3 min timeout for PDF processing
+    500000 // 8+ min timeout for PDF processing
   );
 
   return response.json();
 }
 
-// Text Diagnosis API
+// Text Diagnosis API - Uses Next.js API route to proxy to backend
 export async function diagnoseText(text: string): Promise<DiagnosisResponse> {
   const response = await fetchWithTimeout(
-    `${FRONTEND_API}/diagnose/text/`,
+    "/api/diagnose/text",
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text }),
     },
-    180000 // 3 min timeout for diagnosis
+    500000 // 8+ min timeout for diagnosis
   );
 
   return response.json();
@@ -124,13 +125,13 @@ export async function getXrayAnswer(threadId: string): Promise<string> {
   return result;
 }
 
-// Chat API
+// Chat API - Uses Next.js API route to proxy to backend
 export async function sendChatMessage(
   message: string,
   reportContext?: string,
   conversationHistory?: Array<{ role: string; content: string }>
 ): Promise<ChatResponse> {
-  const response = await fetchWithTimeout(`${FRONTEND_API}/api/chat`, {
+  const response = await fetchWithTimeout("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -143,11 +144,11 @@ export async function sendChatMessage(
   return response.json();
 }
 
-// Medicine Comparison API
+// Medicine Comparison API - Uses Next.js API route to proxy to backend
 export async function compareMedicines(
   medicines: string[]
 ): Promise<{ comparison: Array<Record<string, string>> }> {
-  const response = await fetchWithTimeout(`${FRONTEND_API}/api/compare`, {
+  const response = await fetchWithTimeout("/api/compare", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ medicines }),

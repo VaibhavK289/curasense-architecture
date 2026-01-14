@@ -19,6 +19,29 @@ interface UsageChartProps {
 }
 
 export function UsageChart({ data, className }: UsageChartProps) {
+  // Guard against invalid data
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={springPresets.smooth}
+        className={className}
+      >
+        <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6">
+          <h3 className="text-lg font-semibold text-[hsl(var(--foreground))]">
+            Usage Over Time
+          </h3>
+          <div className="h-[300px] flex items-center justify-center">
+            <p className="text-[hsl(var(--muted-foreground))]">
+              No usage data available yet
+            </p>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
   // Format dates for display
   const formattedData = useMemo(() => {
     return data.map((item) => ({
@@ -62,7 +85,7 @@ export function UsageChart({ data, className }: UsageChartProps) {
           </div>
         </div>
 
-        <div className="h-[300px] w-full">
+        <div className="h-[300px] w-full min-w-0">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={formattedData}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   FileText,
@@ -24,8 +24,33 @@ interface AnalyticsDashboardProps {
 
 export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
   const getAnalytics = useAppStore((state) => state.getAnalytics);
+  const [isMounted, setIsMounted] = useState(false);
   
-  const analytics = useMemo(() => getAnalytics(), [getAnalytics]);
+  // Ensure component only renders on client after hydration
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const analytics = useMemo(() => {
+    if (!isMounted) {
+      return {
+        totalReportsAnalyzed: 0,
+        reportsByType: {},
+        reportsByStatus: {},
+        averageProcessingTime: 0,
+        findingsFrequency: {},
+        dailyUsage: [],
+        accuracyMetrics: {
+          averageConfidence: 0,
+          highConfidenceCount: 0,
+          mediumConfidenceCount: 0,
+          lowConfidenceCount: 0,
+        },
+        lastUpdated: new Date(),
+      };
+    }
+    return getAnalytics();
+  }, [getAnalytics, isMounted]);
 
   // Calculate week-over-week trend
   const weekTrend = useMemo(() => {
