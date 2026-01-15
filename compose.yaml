@@ -10,6 +10,7 @@ services:
     environment:
       - NEXT_PUBLIC_FRONTEND_API=http://backend-ml:8000
       - NEXT_PUBLIC_ML_API=http://backend-vision:8001
+      - BACKEND_API_URL=http://backend-ml:8000
     depends_on:
       - backend-ml
       - backend-vision

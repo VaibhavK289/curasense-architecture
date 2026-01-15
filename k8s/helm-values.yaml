@@ -1,0 +1,350 @@
+# ============================================
+# CURASENSE HELM VALUES
+# Production-ready configuration for Helm deployment
+# Usage: helm install curasense ./helm -f helm-values.yaml
+# ============================================
+
+# Global configuration
+global:
+  domain: "curasense.example.com"
+  environment: "production"
+  imagePullPolicy: "IfNotPresent"
+  
+  # Image registry
+  imageRegistry:
+    registry: "docker.io"
+    username: "your-username"
+    password: "your-password"
+  
+  # Global labels
+  labels:
+    app: curasense
+    environment: production
+    team: healthcare
+
+# Namespace configuration
+namespace:
+  create: true
+  name: curasense
+
+# Frontend service
+frontend:
+  enabled: true
+  
+  replicaCount: 3
+  
+  image:
+    repository: "curasense-frontend"
+    tag: "latest"
+  
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 3000
+  
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+  
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  
+  healthCheck:
+    liveness:
+      enabled: true
+      initialDelaySeconds: 30
+      periodSeconds: 10
+    readiness:
+      enabled: true
+      initialDelaySeconds: 10
+      periodSeconds: 5
+  
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+  
+  environment:
+    NODE_ENV: "production"
+    NEXT_PUBLIC_API_TIMEOUT: "30000"
+
+# ML Backend service
+backend:
+  ml:
+    enabled: true
+    
+    replicaCount: 2
+    
+    image:
+      repository: "curasense-backend-ml"
+      tag: "latest"
+    
+    service:
+      type: ClusterIP
+      port: 8000
+      targetPort: 8000
+    
+    resources:
+      requests:
+        cpu: 500m
+        memory: 1Gi
+      limits:
+        cpu: 2000m
+        memory: 3Gi
+    
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 8
+      targetCPUUtilizationPercentage: 75
+      targetMemoryUtilizationPercentage: 85
+    
+    healthCheck:
+      liveness:
+        enabled: true
+        path: /health
+        initialDelaySeconds: 60
+        periodSeconds: 30
+      readiness:
+        enabled: true
+        path: /health
+        initialDelaySeconds: 45
+        periodSeconds: 10
+    
+    podDisruptionBudget:
+      enabled: true
+      minAvailable: 1
+    
+    terminationGracePeriodSeconds: 300
+    
+    environment:
+      LOG_LEVEL: "INFO"
+      WORKERS: "4"
+
+  # Vision Backend service
+  vision:
+    enabled: true
+    
+    replicaCount: 2
+    
+    image:
+      repository: "curasense-backend-vision"
+      tag: "latest"
+    
+    service:
+      type: ClusterIP
+      port: 8001
+      targetPort: 8001
+    
+    resources:
+      requests:
+        cpu: 1000m
+        memory: 2Gi
+      limits:
+        cpu: 3000m
+        memory: 4Gi
+    
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 6
+      targetCPUUtilizationPercentage: 75
+      targetMemoryUtilizationPercentage: 85
+    
+    healthCheck:
+      liveness:
+        enabled: true
+        path: /health
+        initialDelaySeconds: 60
+        periodSeconds: 30
+      readiness:
+        enabled: true
+        path: /health
+        initialDelaySeconds: 45
+        periodSeconds: 10
+    
+    podDisruptionBudget:
+      enabled: true
+      minAvailable: 1
+    
+    terminationGracePeriodSeconds: 300
+    
+    persistence:
+      enabled: true
+      storageClass: "standard"
+      size: 20Gi
+      mountPath: "/app/models"
+    
+    environment:
+      LOG_LEVEL: "INFO"
+      MODEL_CACHE_DIR: "/app/models"
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: "nginx"
+  
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+  
+  hosts:
+    - host: "curasense.example.com"
+      paths:
+        - path: "/"
+          pathType: "Prefix"
+          backend: "frontend"
+        - path: "/api"
+          pathType: "Prefix"
+          backend: "ml-backend"
+        - path: "/vision"
+          pathType: "Prefix"
+          backend: "vision-backend"
+  
+  tls:
+    enabled: true
+    secretName: "curasense-tls"
+    issuer: "letsencrypt-prod"
+
+# Security configuration
+security:
+  rbac:
+    create: true
+  
+  serviceAccount:
+    create: true
+    name: "curasense-sa"
+  
+  podSecurityPolicy:
+    enabled: false
+  
+  networkPolicy:
+    enabled: true
+
+# Storage configuration
+storage:
+  models:
+    enabled: true
+    storageClass: "standard"
+    size: 20Gi
+  
+  database:
+    enabled: true
+    storageClass: "standard"
+    size: 10Gi
+
+# Database configuration (optional - for managed DB)
+database:
+  type: "postgresql"
+  host: "postgres.default.svc.cluster.local"
+  port: 5432
+  name: "curasense"
+  user: "curasense"
+  # Password should be provided via secrets
+  ssl: false
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  
+  prometheus:
+    enabled: false
+    scrapeInterval: 15s
+  
+  alerts:
+    enabled: false
+    rules: []
+
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "json"
+
+# Resource quotas
+resourceQuota:
+  enabled: true
+  quotas:
+    requests:
+      cpu: "10"
+      memory: "20Gi"
+    limits:
+      cpu: "20"
+      memory: "40Gi"
+
+# Pod limits
+podLimits:
+  enabled: true
+  container:
+    min:
+      cpu: "50m"
+      memory: "64Mi"
+    max:
+      cpu: "4000m"
+      memory: "8Gi"
+  pod:
+    min:
+      cpu: "100m"
+      memory: "128Mi"
+    max:
+      cpu: "8000m"
+      memory: "16Gi"
+
+# Affinity rules
+affinity:
+  podAntiAffinity: "preferred"
+  nodeSelector: {}
+  tolerations: []
+
+# Environment-specific overrides
+environments:
+  development:
+    replicaCount: 1
+    imagePullPolicy: "Always"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 200m
+        memory: 512Mi
+  
+  staging:
+    replicaCount: 2
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 400m
+        memory: 1Gi
+  
+  production:
+    replicaCount: 3
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+# Feature flags
+features:
+  https: true
+  monitoring: false
+  logging: true
+  networkPolicies: true
+  rbac: true

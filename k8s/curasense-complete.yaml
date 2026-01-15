@@ -1,0 +1,750 @@
+---
+# ============================================
+# CURASENSE KUBERNETES DEPLOYMENT
+# Production-grade multi-service setup
+# ============================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: curasense
+  labels:
+    name: curasense
+
+---
+# ============================================
+# CONFIGMAP - Environment Configuration
+# ============================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: curasense-config
+  namespace: curasense
+data:
+  # Frontend config
+  NEXT_PUBLIC_FRONTEND_API: "http://localhost:8000"
+  NEXT_PUBLIC_ML_API: "http://localhost:8000"
+  NEXT_PUBLIC_VISION_API: "http://localhost:8001"
+  NEXT_PUBLIC_API_TIMEOUT: "30000"
+  
+  # Backend ML config
+  VISION_API_URL: "http://curasense-vision-service.curasense.svc.cluster.local:8001"
+  FRONTEND_API: "http://curasense-frontend-service.curasense.svc.cluster.local:3000"
+  BACKEND_API_URL: "http://curasense-ml-service.curasense.svc.cluster.local:8000"
+  LOG_LEVEL: "INFO"
+  
+  # Backend Vision config
+  MODEL_CACHE_DIR: "/app/models"
+  RAG_DB_HOST: "postgres"
+  RAG_DB_PORT: "5432"
+  RAG_DB_NAME: "curasense"
+  
+  # Common
+  NODE_ENV: "production"
+  NEXT_TELEMETRY_DISABLED: "1"
+
+---
+# ============================================
+# SECRET - Sensitive Data
+# ============================================
+apiVersion: v1
+kind: Secret
+metadata:
+  name: curasense-secrets
+  namespace: curasense
+type: Opaque
+stringData:
+  # JWT and Auth
+  NEXTAUTH_SECRET: "your-secret-key-change-in-production-use-openssl-rand-hex-32"
+  NEXTAUTH_URL: "http://localhost:3000"
+  
+  # Database
+  DATABASE_URL: "postgresql://user:password@postgres:5432/curasense"
+  
+  # API Keys
+  GEMINI_API_KEY: "your-gemini-api-key"
+  HUGGINGFACE_API_KEY: "your-huggingface-api-key"
+  
+  # Database credentials
+  DB_USER: "curasense"
+  DB_PASSWORD: "your-secure-db-password"
+
+---
+# ============================================
+# PERSISTENT VOLUME CLAIM - Model Storage
+# ============================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: curasense-models-pvc
+  namespace: curasense
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: standard
+
+---
+# ============================================
+# PERSISTENT VOLUME CLAIM - Database
+# ============================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: curasense-db-pvc
+  namespace: curasense
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard
+
+---
+# ============================================
+# FRONTEND DEPLOYMENT
+# ============================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: curasense-frontend
+  namespace: curasense
+  labels:
+    app: curasense-frontend
+    tier: frontend
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: curasense-frontend
+  template:
+    metadata:
+      labels:
+        app: curasense-frontend
+        tier: frontend
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+      
+      containers:
+      - name: frontend
+        image: curasense-frontend:latest
+        imagePullPolicy: IfNotPresent
+        
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        
+        envFrom:
+        - configMapRef:
+            name: curasense-config
+        - secretRef:
+            name: curasense-secrets
+        
+        env:
+        - name: PORT
+          value: "3000"
+        - name: HOSTNAME
+          value: "0.0.0.0"
+        - name: BACKEND_API_URL
+          value: "http://curasense-ml-service.curasense.svc.cluster.local:8000"
+        
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+        
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+
+---
+# ============================================
+# FRONTEND SERVICE
+# ============================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: curasense-frontend-service
+  namespace: curasense
+  labels:
+    app: curasense-frontend
+spec:
+  type: ClusterIP
+  selector:
+    app: curasense-frontend
+  ports:
+  - name: http
+    port: 80
+    targetPort: 3000
+    protocol: TCP
+
+---
+# ============================================
+# BACKEND ML DEPLOYMENT
+# ============================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: curasense-ml
+  namespace: curasense
+  labels:
+    app: curasense-ml
+    tier: backend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: curasense-ml
+  template:
+    metadata:
+      labels:
+        app: curasense-ml
+        tier: backend
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      
+      containers:
+      - name: ml-service
+        image: curasense-backend-ml:latest
+        imagePullPolicy: IfNotPresent
+        
+        ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
+        
+        envFrom:
+        - configMapRef:
+            name: curasense-config
+        - secretRef:
+            name: curasense-secrets
+        
+        env:
+        - name: VISION_API_URL
+          value: "http://curasense-vision-service.curasense.svc.cluster.local:8001"
+        - name: FRONTEND_URL
+          value: "http://curasense-frontend-service.curasense.svc.cluster.local:80"
+        
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 2000m
+            memory: 3Gi
+        
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 45
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 2
+        
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+      
+      terminationGracePeriodSeconds: 300
+
+---
+# ============================================
+# BACKEND ML SERVICE
+# ============================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: curasense-ml-service
+  namespace: curasense
+  labels:
+    app: curasense-ml
+spec:
+  type: ClusterIP
+  selector:
+    app: curasense-ml
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+    protocol: TCP
+
+---
+# ============================================
+# BACKEND VISION DEPLOYMENT
+# ============================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: curasense-vision
+  namespace: curasense
+  labels:
+    app: curasense-vision
+    tier: backend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: curasense-vision
+  template:
+    metadata:
+      labels:
+        app: curasense-vision
+        tier: backend
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      
+      containers:
+      - name: vision-service
+        image: curasense-backend-vision:latest
+        imagePullPolicy: IfNotPresent
+        
+        ports:
+        - name: http
+          containerPort: 8001
+          protocol: TCP
+        
+        envFrom:
+        - configMapRef:
+            name: curasense-config
+        - secretRef:
+            name: curasense-secrets
+        
+        env:
+        - name: MODEL_CACHE_DIR
+          value: "/app/models"
+        
+        volumeMounts:
+        - name: model-cache
+          mountPath: /app/models
+        
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 2Gi
+          limits:
+            cpu: 3000m
+            memory: 4Gi
+        
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8001
+          initialDelaySeconds: 45
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 2
+        
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+      
+      volumes:
+      - name: model-cache
+        persistentVolumeClaim:
+          claimName: curasense-models-pvc
+      
+      terminationGracePeriodSeconds: 300
+
+---
+# ============================================
+# BACKEND VISION SERVICE
+# ============================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: curasense-vision-service
+  namespace: curasense
+  labels:
+    app: curasense-vision
+spec:
+  type: ClusterIP
+  selector:
+    app: curasense-vision
+  ports:
+  - name: http
+    port: 8001
+    targetPort: 8001
+    protocol: TCP
+
+---
+# ============================================
+# INGRESS - External traffic routing
+# ============================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: curasense-ingress
+  namespace: curasense
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+spec:
+  tls:
+  - hosts:
+    - curasense.example.com
+    secretName: curasense-tls
+  
+  rules:
+  - host: curasense.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: curasense-frontend-service
+            port:
+              number: 80
+      - path: /api/diagnose
+        pathType: Prefix
+        backend:
+          service:
+            name: curasense-ml-service
+            port:
+              number: 8000
+      - path: /vision
+        pathType: Prefix
+        backend:
+          service:
+            name: curasense-vision-service
+            port:
+              number: 8001
+
+---
+# ============================================
+# HORIZONTAL POD AUTOSCALER - Frontend
+# ============================================
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: curasense-frontend-hpa
+  namespace: curasense
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: curasense-frontend
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 15
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+      - type: Pods
+        value: 2
+        periodSeconds: 15
+      selectPolicy: Max
+
+---
+# ============================================
+# HORIZONTAL POD AUTOSCALER - ML Backend
+# ============================================
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: curasense-ml-hpa
+  namespace: curasense
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: curasense-ml
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 75
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 85
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 30
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 30
+      selectPolicy: Max
+
+---
+# ============================================
+# HORIZONTAL POD AUTOSCALER - Vision Backend
+# ============================================
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: curasense-vision-hpa
+  namespace: curasense
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: curasense-vision
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 75
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 85
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 30
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 30
+      selectPolicy: Max
+
+---
+# ============================================
+# NETWORK POLICY - Internal traffic only
+# ============================================
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: curasense-network-policy
+  namespace: curasense
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: curasense
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: curasense
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 443
+
+---
+# ============================================
+# POD DISRUPTION BUDGET - Frontend
+# ============================================
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: curasense-frontend-pdb
+  namespace: curasense
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: curasense-frontend
+
+---
+# ============================================
+# POD DISRUPTION BUDGET - ML Backend
+# ============================================
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: curasense-ml-pdb
+  namespace: curasense
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: curasense-ml
+
+---
+# ============================================
+# POD DISRUPTION BUDGET - Vision Backend
+# ============================================
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: curasense-vision-pdb
+  namespace: curasense
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: curasense-vision
+
+---
+# ============================================
+# SERVICE ACCOUNT - RBAC
+# ============================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: curasense-sa
+  namespace: curasense
+
+---
+# ============================================
+# ROLE - Permissions for curasense services
+# ============================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: curasense-role
+  namespace: curasense
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list", "watch"]
+
+---
+# ============================================
+# ROLE BINDING - Attach role to service account
+# ============================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: curasense-rolebinding
+  namespace: curasense
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: curasense-role
+subjects:
+- kind: ServiceAccount
+  name: curasense-sa
+  namespace: curasense

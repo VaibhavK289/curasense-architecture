@@ -1,0 +1,247 @@
+---
+# ============================================
+# CURASENSE INFRASTRUCTURE CONFIG
+# ConfigMaps, Secrets, PVCs, RBAC, NetworkPolicy
+# ============================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: curasense
+  labels:
+    name: curasense
+    monitoring: enabled
+
+---
+# ============================================
+# CONFIGMAP - Environment Configuration
+# ============================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: curasense-config
+  namespace: curasense
+  labels:
+    app: curasense
+data:
+  # Frontend config
+  NEXT_PUBLIC_FRONTEND_API: "http://localhost:8000"
+  NEXT_PUBLIC_ML_API: "http://localhost:8000"
+  NEXT_PUBLIC_VISION_API: "http://localhost:8001"
+  NEXT_PUBLIC_API_TIMEOUT: "30000"
+  NODE_ENV: "production"
+  NEXT_TELEMETRY_DISABLED: "1"
+  
+  # Backend service discovery
+  VISION_API_URL: "http://curasense-vision-service.curasense.svc.cluster.local:8001"
+  FRONTEND_URL: "http://curasense-frontend-service.curasense.svc.cluster.local:80"
+  BACKEND_API_URL: "http://curasense-ml-service.curasense.svc.cluster.local:8000"
+  
+  # Database
+  RAG_DB_HOST: "postgres.curasense.svc.cluster.local"
+  RAG_DB_PORT: "5432"
+  RAG_DB_NAME: "curasense"
+  
+  # AI/ML Config
+  MODEL_CACHE_DIR: "/app/models"
+  LOG_LEVEL: "INFO"
+  WORKERS: "4"
+
+---
+# ============================================
+# SECRET - Sensitive Data
+# Create with: kubectl create secret generic curasense-secrets \
+#   --from-literal=NEXTAUTH_SECRET=$(openssl rand -hex 32) \
+#   --from-literal=GEMINI_API_KEY='...' \
+#   --from-literal=HUGGINGFACE_API_KEY='...' \
+#   -n curasense
+# ============================================
+apiVersion: v1
+kind: Secret
+metadata:
+  name: curasense-secrets
+  namespace: curasense
+type: Opaque
+data:
+  # Base64 encoded - replace with actual values
+  NEXTAUTH_SECRET: "Y2hhbmdlLWluLXByb2R1Y3Rpb24=" # change-in-production
+  NEXTAUTH_URL: "aHR0cHM6Ly9jdXJhc2Vuc2UuZXhhbXBsZS5jb20=" # https://curasense.example.com
+  DATABASE_URL: "cG9zdGdyZXNxbDovL3VzZXI6cGFzc3dvcmRAcG9zdGdyZXM6NTQzMi9jdXJhc2Vuc2U=" # Update this
+  GEMINI_API_KEY: "eW91ci1nZW1pbmktYXBpLWtleQ==" # your-gemini-api-key
+  HUGGINGFACE_API_KEY: "eW91ci1odWdnaW5nZmFjZS1hcGkta2V5" # your-huggingface-api-key
+  DB_USER: "Y3VyYXNlbnNl" # curasense
+  DB_PASSWORD: "c2VjdXJlLXBhc3N3b3Jk" # secure-password
+
+---
+# ============================================
+# PERSISTENT VOLUME CLAIM - Model Storage
+# ============================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: curasense-models-pvc
+  namespace: curasense
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: standard
+
+---
+# ============================================
+# PERSISTENT VOLUME CLAIM - Database
+# ============================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: curasense-db-pvc
+  namespace: curasense
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard
+
+---
+# ============================================
+# SERVICE ACCOUNT
+# ============================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: curasense-sa
+  namespace: curasense
+  labels:
+    app: curasense
+
+---
+# ============================================
+# ROLE - Permissions
+# ============================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: curasense-role
+  namespace: curasense
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list", "watch"]
+
+---
+# ============================================
+# ROLE BINDING
+# ============================================
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: curasense-rolebinding
+  namespace: curasense
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: curasense-role
+subjects:
+- kind: ServiceAccount
+  name: curasense-sa
+  namespace: curasense
+
+---
+# ============================================
+# NETWORK POLICY - Security
+# ============================================
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: curasense-network-policy
+  namespace: curasense
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: curasense
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: curasense
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 5432
+
+---
+# ============================================
+# RESOURCE QUOTA - Limit namespace resources
+# ============================================
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: curasense-quota
+  namespace: curasense
+spec:
+  hard:
+    requests.cpu: "10"
+    requests.memory: "20Gi"
+    limits.cpu: "20"
+    limits.memory: "40Gi"
+    pods: "50"
+    services: "10"
+    persistentvolumeclaims: "5"
+
+---
+# ============================================
+# LIMIT RANGE - Per-container limits
+# ============================================
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: curasense-limits
+  namespace: curasense
+spec:
+  limits:
+  - type: Container
+    min:
+      cpu: "50m"
+      memory: "64Mi"
+    max:
+      cpu: "4000m"
+      memory: "8Gi"
+    default:
+      cpu: "500m"
+      memory: "512Mi"
+    defaultRequest:
+      cpu: "250m"
+      memory: "256Mi"
+  - type: Pod
+    min:
+      cpu: "100m"
+      memory: "128Mi"
+    max:
+      cpu: "8000m"
+      memory: "16Gi"
