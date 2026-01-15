@@ -20,6 +20,7 @@ export interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isGuest: boolean;
   isLoading: boolean;
   accessToken: string | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
@@ -28,6 +29,8 @@ interface AuthContextType {
   forgotPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
   resetPassword: (token: string, password: string) => Promise<{ success: boolean; error?: string }>;
   refreshToken: () => Promise<boolean>;
+  continueAsGuest: () => void;
+  exitGuestMode: () => void;
 }
 
 interface RegisterData {
@@ -50,6 +53,7 @@ interface AuthState {
 // ============================================
 
 const AUTH_STORAGE_KEY = "curasense_auth";
+const GUEST_STORAGE_KEY = "curasense_guest";
 const TOKEN_REFRESH_THRESHOLD = 5 * 60 * 1000; // 5 minutes before expiry
 
 // ============================================
@@ -69,6 +73,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     expiresAt: null,
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [isGuest, setIsGuest] = useState(false);
+
+  // Guest mode functions
+  const continueAsGuest = useCallback(() => {
+    setIsGuest(true);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(GUEST_STORAGE_KEY, "true");
+    }
+  }, []);
+
+  const exitGuestMode = useCallback(() => {
+    setIsGuest(false);
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(GUEST_STORAGE_KEY);
+    }
+  }, []);
+
+  // Check for guest mode on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const guestMode = localStorage.getItem(GUEST_STORAGE_KEY);
+      if (guestMode === "true") {
+        setIsGuest(true);
+      }
+    }
+  }, []);
 
   // Persist auth state to localStorage
   const persistAuth = useCallback((state: AuthState) => {
@@ -322,6 +352,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user: authState.user,
         isAuthenticated: !!authState.user,
+        isGuest,
         isLoading,
         accessToken: authState.accessToken,
         login,
@@ -330,6 +361,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         forgotPassword,
         resetPassword,
         refreshToken,
+        continueAsGuest,
+        exitGuestMode,
       }}
     >
       {children}

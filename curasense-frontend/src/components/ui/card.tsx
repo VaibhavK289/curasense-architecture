@@ -8,10 +8,11 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      // Clinical design: tighter radius (rounded-lg = 0.5rem vs rounded-xl = 0.75rem)
-      // Solid border for medical precision, minimal shadow for grounded feel
-      "rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] text-[hsl(var(--card-foreground))]",
-      "transition-colors duration-150",
+      // Premium card with softer radius and subtle shadow
+      "rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] text-[hsl(var(--card-foreground))]",
+      "shadow-sm shadow-[hsl(var(--neutral-950)/0.03)]",
+      "dark:shadow-[hsl(var(--neutral-950)/0.2)]",
+      "transition-all duration-200 ease-out",
       className
     )}
     {...props}
@@ -38,7 +39,7 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      "text-xl font-semibold leading-none tracking-tight text-[hsl(var(--foreground))]",
+      "text-xl font-semibold leading-tight tracking-tight text-[hsl(var(--foreground))]",
       className
     )}
     {...props}
@@ -52,7 +53,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-[hsl(var(--muted-foreground))]", className)}
+    className={cn("text-sm text-[hsl(var(--muted-foreground))] leading-relaxed", className)}
     {...props}
   />
 ));

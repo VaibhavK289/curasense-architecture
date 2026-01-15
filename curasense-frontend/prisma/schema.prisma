@@ -85,7 +85,7 @@ model User {
   failedLoginCount  Int         @default(0) @map("failed_login_count")
   lockedUntil       DateTime?   @map("locked_until")
   
-  // Preferences
+  // Legacy Preferences (use UserPreference relation instead)
   preferences       Json?       @default("{}")
   
   // Timestamps
@@ -97,6 +97,11 @@ model User {
   reports           Report[]
   sessions          Session[]
   auditLogs         AuditLog[]
+  userPreference    UserPreference?
+  activities        UserActivity[]
+  userStats         UserStats?
+  savedMedicines    SavedMedicine[]
+  healthProfile     HealthProfile?
 
   // Indexes for common queries
   @@index([email])
@@ -284,5 +289,189 @@ model PasswordResetToken {
   @@index([expiresAt])
   
   @@map("password_reset_tokens")
+}
+
+// ============================================
+// USER PREFERENCES TABLE
+// Stores user settings and preferences
+// ============================================
+
+model UserPreference {
+  id              String    @id @default(cuid())
+  
+  userId          String    @unique @map("user_id")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Privacy Settings
+  anonymousMode     Boolean   @default(false) @map("anonymous_mode")
+  trackHistory      Boolean   @default(true) @map("track_history")
+  shareAnalytics    Boolean   @default(true) @map("share_analytics")
+  
+  // Display Settings
+  theme             String    @default("system") // "light", "dark", "system"
+  language          String    @default("en")
+  timezone          String?
+  dateFormat        String    @default("MM/DD/YYYY") @map("date_format")
+  
+  // Notification Settings
+  emailNotifications    Boolean @default(true) @map("email_notifications")
+  pushNotifications     Boolean @default(true) @map("push_notifications")
+  reportReadyAlerts     Boolean @default(true) @map("report_ready_alerts")
+  weeklyDigest          Boolean @default(true) @map("weekly_digest")
+  
+  // Dashboard Settings
+  dashboardLayout       String  @default("grid") @map("dashboard_layout") // "grid", "list", "compact"
+  showQuickStats        Boolean @default(true) @map("show_quick_stats")
+  showRecentActivity    Boolean @default(true) @map("show_recent_activity")
+  defaultReportType     String? @map("default_report_type")
+  
+  // Timestamps
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  
+  @@index([userId])
+  
+  @@map("user_preferences")
+}
+
+// ============================================
+// USER ACTIVITY TABLE
+// Tracks user activity for dashboard and insights
+// ============================================
+
+model UserActivity {
+  id              String    @id @default(cuid())
+  
+  userId          String    @map("user_id")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Activity Info
+  type            String    // "report_created", "report_viewed", "login", "settings_updated", etc.
+  title           String
+  description     String?
+  
+  // Related Entity
+  entityType      String?   @map("entity_type")
+  entityId        String?   @map("entity_id")
+  
+  // Metadata
+  metadata        Json?     @default("{}")
+  
+  // Timestamps
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  @@index([userId])
+  @@index([type])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([createdAt])
+  
+  @@map("user_activities")
+}
+
+// ============================================
+// USER STATS TABLE
+// Aggregated user statistics for dashboard
+// ============================================
+
+model UserStats {
+  id                    String    @id @default(cuid())
+  
+  userId                String    @unique @map("user_id")
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Report Stats
+  totalReports          Int       @default(0) @map("total_reports")
+  prescriptionReports   Int       @default(0) @map("prescription_reports")
+  imagingReports        Int       @default(0) @map("imaging_reports")
+  medicineQueries       Int       @default(0) @map("medicine_queries")
+  
+  // Performance Metrics
+  avgConfidenceScore    Float?    @map("avg_confidence_score")
+  avgProcessingTime     Float?    @map("avg_processing_time")
+  
+  // Engagement Metrics
+  totalLogins           Int       @default(0) @map("total_logins")
+  lastActiveAt          DateTime? @map("last_active_at")
+  streakDays            Int       @default(0) @map("streak_days")
+  lastStreakDate        DateTime? @map("last_streak_date")
+  
+  // Timestamps
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  
+  @@index([userId])
+  
+  @@map("user_stats")
+}
+
+// ============================================
+// SAVED MEDICINES TABLE
+// User's saved/favorite medicines
+// ============================================
+
+model SavedMedicine {
+  id              String    @id @default(cuid())
+  
+  userId          String    @map("user_id")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  medicineName    String    @map("medicine_name")
+  genericName     String?   @map("generic_name")
+  dosage          String?
+  frequency       String?
+  notes           String?   @db.Text
+  
+  // Metadata
+  isActive        Boolean   @default(true) @map("is_active")
+  startDate       DateTime? @map("start_date")
+  endDate         DateTime? @map("end_date")
+  
+  // Timestamps
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  @@index([userId])
+  @@index([medicineName])
+  
+  @@map("saved_medicines")
+}
+
+// ============================================
+// HEALTH PROFILE TABLE
+// User's health information for better AI analysis
+// ============================================
+
+model HealthProfile {
+  id              String    @id @default(cuid())
+  
+  userId          String    @unique @map("user_id")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Basic Health Info
+  bloodType       String?   @map("blood_type")
+  height          Float?    // in cm
+  weight          Float?    // in kg
+  
+  // Conditions
+  allergies       String[]  @default([])
+  conditions      String[]  @default([]) // chronic conditions
+  medications     String[]  @default([]) // current medications
+  
+  // Lifestyle
+  smokingStatus   String?   @map("smoking_status")
+  alcoholConsumption String? @map("alcohol_consumption")
+  exerciseFrequency String? @map("exercise_frequency")
+  
+  // Emergency Contact
+  emergencyContactName  String? @map("emergency_contact_name")
+  emergencyContactPhone String? @map("emergency_contact_phone")
+  
+  // Timestamps
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  @@index([userId])
+  
+  @@map("health_profiles")
 }
 

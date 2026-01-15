@@ -9,12 +9,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <input
         type={type}
         className={cn(
-          "flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm ring-offset-white transition-all duration-300",
-          "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-slate-950",
-          "placeholder:text-slate-400",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/50 focus-visible:border-teal-500",
-          "disabled:cursor-not-allowed disabled:opacity-50",
-          "dark:border-slate-700 dark:bg-slate-900 dark:ring-offset-slate-950 dark:file:text-slate-50 dark:placeholder:text-slate-500 dark:focus-visible:ring-teal-400/50",
+          "flex h-11 w-full rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-4 py-2 text-sm transition-all duration-200 ease-out",
+          "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-[hsl(var(--foreground))]",
+          "placeholder:text-[hsl(var(--muted-foreground))]",
+          "hover:border-[hsl(var(--neutral-300))] dark:hover:border-[hsl(var(--neutral-600))]",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring)/0.4)] focus-visible:border-[hsl(var(--brand-primary))]",
+          "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-[hsl(var(--muted))]",
           className
         )}
         ref={ref}

@@ -1,141 +1,310 @@
 @import "tailwindcss";
 
 /* ================================================
-   CURASENSE ENTERPRISE DESIGN SYSTEM
-   Healthcare Color Palette with Semantic Meaning
+   CURASENSE PREMIUM DESIGN SYSTEM V3.0
+   Vibrant Healthcare Color Palette
+   Refined for Visual Impact & Harmony
    ================================================ */
 
 :root {
-  /* Brand Colors */
-  --brand-primary: 168 84% 40%;
-  --brand-primary-light: 168 84% 50%;
-  --brand-primary-dark: 168 84% 32%;
-  --brand-secondary: 262 83% 58%;
-  --brand-secondary-light: 262 83% 68%;
-  --brand-secondary-dark: 262 83% 48%;
-
-  /* Semantic Colors - Healthcare Specific */
-  --color-success: 142 76% 36%;
-  --color-success-light: 142 76% 90%;
-  --color-success-dark: 142 76% 29%;
+  /* ============================================
+     BRAND COLORS - Vibrant Teal + Electric Purple
+     Primary: Healthcare trust & calm
+     Secondary: Innovation & AI technology
+     ============================================ */
+  --brand-primary: 168 82% 38%;
+  --brand-primary-light: 168 75% 48%;
+  --brand-primary-lighter: 168 70% 58%;
+  --brand-primary-dark: 168 85% 28%;
+  --brand-primary-muted: 168 40% 85%;
   
-  --color-warning: 38 92% 50%;
-  --color-warning-light: 38 92% 90%;
-  --color-warning-dark: 38 92% 42%;
+  --brand-secondary: 262 83% 58%;
+  --brand-secondary-light: 262 78% 68%;
+  --brand-secondary-lighter: 262 70% 78%;
+  --brand-secondary-dark: 262 85% 48%;
+  --brand-secondary-muted: 262 40% 90%;
+
+  /* ============================================
+     ACCENT COLORS - For Visual Pop
+     Used sparingly for highlights & CTAs
+     ============================================ */
+  --accent-cyan: 188 95% 45%;
+  --accent-cyan-light: 188 90% 55%;
+  --accent-violet: 278 75% 55%;
+  --accent-violet-light: 278 70% 65%;
+  --accent-rose: 350 85% 60%;
+  --accent-rose-light: 350 80% 70%;
+  --accent-amber: 38 95% 55%;
+  --accent-amber-light: 38 90% 65%;
+  --accent-lime: 82 75% 45%;
+  --accent-lime-light: 82 70% 55%;
+
+  /* ============================================
+     SEMANTIC COLORS - Healthcare Specific
+     Optimized for accessibility & clarity
+     ============================================ */
+  --color-success: 152 76% 36%;
+  --color-success-light: 152 72% 94%;
+  --color-success-lighter: 152 68% 96%;
+  --color-success-dark: 152 80% 28%;
+  --color-success-vibrant: 152 82% 42%;
+  
+  --color-warning: 38 95% 50%;
+  --color-warning-light: 38 92% 94%;
+  --color-warning-lighter: 38 88% 96%;
+  --color-warning-dark: 38 98% 42%;
+  --color-warning-vibrant: 38 100% 55%;
   
   --color-error: 0 84% 60%;
-  --color-error-light: 0 84% 95%;
-  --color-error-dark: 0 84% 50%;
+  --color-error-light: 0 80% 96%;
+  --color-error-lighter: 0 75% 98%;
+  --color-error-dark: 0 88% 50%;
+  --color-error-vibrant: 0 90% 65%;
   
-  --color-info: 201 96% 32%;
-  --color-info-light: 201 96% 90%;
-  --color-info-dark: 201 96% 26%;
+  --color-info: 210 95% 50%;
+  --color-info-light: 210 92% 95%;
+  --color-info-lighter: 210 88% 97%;
+  --color-info-dark: 210 98% 40%;
+  --color-info-vibrant: 210 100% 55%;
 
-  /* Category Colors */
-  --color-diagnosis: 201 96% 32%;
+  /* ============================================
+     CATEGORY COLORS - Feature-Specific
+     Distinct & memorable for each section
+     ============================================ */
+  --color-diagnosis: 210 95% 50%;
+  --color-diagnosis-light: 210 90% 95%;
+  --color-diagnosis-glow: 210 100% 60%;
+  
   --color-imaging: 262 83% 58%;
-  --color-medicine: 142 76% 36%;
-  --color-records: 38 92% 50%;
+  --color-imaging-light: 262 78% 95%;
+  --color-imaging-glow: 262 88% 65%;
+  
+  --color-medicine: 152 76% 36%;
+  --color-medicine-light: 152 72% 94%;
+  --color-medicine-glow: 152 82% 42%;
+  
+  --color-records: 38 95% 50%;
+  --color-records-light: 38 92% 94%;
+  --color-records-glow: 38 100% 55%;
 
-  /* Neutral Scale */
+  /* ============================================
+     NEUTRAL SCALE - Warm Gray with Blue Undertone
+     Creates inviting, professional feel
+     ============================================ */
   --neutral-0: 0 0% 100%;
-  --neutral-50: 210 40% 98%;
-  --neutral-100: 210 40% 96%;
-  --neutral-200: 214 32% 91%;
-  --neutral-300: 213 27% 84%;
-  --neutral-400: 215 20% 65%;
-  --neutral-500: 215 16% 47%;
-  --neutral-600: 215 19% 35%;
-  --neutral-700: 215 25% 27%;
-  --neutral-800: 217 33% 17%;
-  --neutral-900: 222 47% 11%;
-  --neutral-950: 229 84% 5%;
+  --neutral-25: 220 30% 99%;
+  --neutral-50: 220 28% 97%;
+  --neutral-100: 220 24% 95%;
+  --neutral-150: 218 22% 92%;
+  --neutral-200: 218 18% 88%;
+  --neutral-300: 216 14% 78%;
+  --neutral-400: 214 12% 58%;
+  --neutral-500: 212 12% 45%;
+  --neutral-600: 214 15% 34%;
+  --neutral-700: 216 18% 24%;
+  --neutral-800: 218 22% 16%;
+  --neutral-850: 220 26% 12%;
+  --neutral-900: 222 32% 9%;
+  --neutral-950: 226 42% 5%;
 
-  /* Surface Colors */
-  --background: 210 40% 98%;
-  --foreground: 222 47% 11%;
+  /* ============================================
+     SURFACE COLORS - Clean & Airy Light Mode
+     ============================================ */
+  --background: 220 30% 98%;
+  --background-subtle: 220 28% 96%;
+  --foreground: 222 32% 12%;
+  --foreground-muted: 214 12% 45%;
+  
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
+  --card-foreground: 222 32% 12%;
+  --card-hover: 220 25% 98%;
+  
   --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
+  --popover-foreground: 222 32% 12%;
   
-  /* Component Colors */
-  --primary: 168 84% 40%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222 47% 11%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
-  --accent: 210 40% 96%;
-  --accent-foreground: 222 47% 11%;
+  /* ============================================
+     COMPONENT COLORS - Primary Actions
+     ============================================ */
+  --primary: 168 82% 38%;
+  --primary-foreground: 0 0% 100%;
+  --primary-hover: 168 85% 32%;
+  
+  --secondary: 220 24% 95%;
+  --secondary-foreground: 222 32% 12%;
+  --secondary-hover: 220 20% 92%;
+  
+  --muted: 220 22% 94%;
+  --muted-foreground: 214 12% 45%;
+  
+  --accent: 220 18% 92%;
+  --accent-foreground: 222 32% 12%;
+  
   --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 98%;
+  --destructive-foreground: 0 0% 100%;
   
-  /* Borders & Inputs */
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 168 84% 40%;
+  /* ============================================
+     BORDERS & INPUTS - Subtle Definition
+     ============================================ */
+  --border: 220 16% 88%;
+  --border-light: 220 18% 92%;
+  --border-focus: 168 82% 38%;
+  --input: 220 16% 88%;
+  --input-focus: 168 70% 95%;
+  --ring: 168 82% 38%;
+  
+  /* ============================================
+     GRADIENT PRESETS - Beautiful Blends
+     ============================================ */
+  --gradient-brand: linear-gradient(135deg, hsl(168 82% 38%), hsl(262 83% 58%));
+  --gradient-brand-soft: linear-gradient(135deg, hsl(168 70% 95%), hsl(262 70% 95%));
+  --gradient-sunrise: linear-gradient(135deg, hsl(350 85% 60%), hsl(38 95% 55%));
+  --gradient-ocean: linear-gradient(135deg, hsl(188 95% 45%), hsl(210 95% 50%));
+  --gradient-forest: linear-gradient(135deg, hsl(152 76% 36%), hsl(82 75% 45%));
+  --gradient-aurora: linear-gradient(135deg, hsl(262 83% 58%), hsl(188 95% 45%), hsl(152 76% 36%));
+  --gradient-mesh: radial-gradient(at 40% 20%, hsl(168 82% 38% / 0.15) 0px, transparent 50%),
+                   radial-gradient(at 80% 0%, hsl(262 83% 58% / 0.12) 0px, transparent 50%),
+                   radial-gradient(at 0% 50%, hsl(188 95% 45% / 0.1) 0px, transparent 50%);
   
   /* Radius */
-  --radius: 0.5rem;
+  --radius: 0.625rem;
 }
 
+/* ================================================
+   DARK MODE - Rich & Vibrant
+   ================================================ */
 .dark {
-  /* Brand Colors - Brighter for dark mode */
-  --brand-primary: 168 84% 45%;
-  --brand-primary-light: 168 84% 55%;
-  --brand-primary-dark: 168 84% 35%;
-  --brand-secondary: 262 83% 65%;
-  --brand-secondary-light: 262 83% 72%;
-  --brand-secondary-dark: 262 83% 55%;
+  /* ============================================
+     BRAND COLORS - Luminous for Dark Backgrounds
+     ============================================ */
+  --brand-primary: 168 78% 52%;
+  --brand-primary-light: 168 72% 62%;
+  --brand-primary-lighter: 168 65% 72%;
+  --brand-primary-dark: 168 80% 42%;
+  --brand-primary-muted: 168 30% 25%;
+  
+  --brand-secondary: 262 78% 70%;
+  --brand-secondary-light: 262 72% 78%;
+  --brand-secondary-lighter: 262 65% 85%;
+  --brand-secondary-dark: 262 82% 60%;
+  --brand-secondary-muted: 262 30% 25%;
 
-  /* Semantic Colors - Adjusted for dark backgrounds */
-  --color-success: 142 71% 45%;
-  --color-success-light: 142 76% 15%;
-  --color-success-dark: 142 76% 36%;
-  
-  --color-warning: 38 92% 55%;
-  --color-warning-light: 38 92% 15%;
-  --color-warning-dark: 38 92% 45%;
-  
-  --color-error: 0 84% 60%;
-  --color-error-light: 0 84% 15%;
-  --color-error-dark: 0 84% 50%;
-  
-  --color-info: 199 89% 48%;
-  --color-info-light: 201 96% 15%;
-  --color-info-dark: 201 96% 38%;
+  /* ============================================
+     ACCENT COLORS - Glowing for Dark Mode
+     ============================================ */
+  --accent-cyan: 188 90% 55%;
+  --accent-cyan-light: 188 85% 65%;
+  --accent-violet: 278 72% 68%;
+  --accent-violet-light: 278 68% 75%;
+  --accent-rose: 350 82% 68%;
+  --accent-rose-light: 350 78% 75%;
+  --accent-amber: 38 92% 62%;
+  --accent-amber-light: 38 88% 70%;
+  --accent-lime: 82 72% 55%;
+  --accent-lime-light: 82 68% 65%;
 
-  /* Category Colors - Brighter */
-  --color-diagnosis: 199 89% 48%;
-  --color-imaging: 262 83% 65%;
-  --color-medicine: 142 71% 45%;
-  --color-records: 38 92% 55%;
+  /* ============================================
+     SEMANTIC COLORS - Bright & Clear
+     ============================================ */
+  --color-success: 152 72% 50%;
+  --color-success-light: 152 65% 18%;
+  --color-success-lighter: 152 60% 14%;
+  --color-success-dark: 152 78% 40%;
+  --color-success-vibrant: 152 80% 55%;
+  
+  --color-warning: 38 92% 58%;
+  --color-warning-light: 38 88% 18%;
+  --color-warning-lighter: 38 84% 14%;
+  --color-warning-dark: 38 95% 48%;
+  --color-warning-vibrant: 38 98% 62%;
+  
+  --color-error: 0 80% 65%;
+  --color-error-light: 0 75% 18%;
+  --color-error-lighter: 0 70% 14%;
+  --color-error-dark: 0 85% 55%;
+  --color-error-vibrant: 0 88% 70%;
+  
+  --color-info: 210 92% 60%;
+  --color-info-light: 210 88% 18%;
+  --color-info-lighter: 210 84% 14%;
+  --color-info-dark: 210 95% 50%;
+  --color-info-vibrant: 210 98% 65%;
 
-  /* Surface Colors */
-  --background: 229 84% 5%;
-  --foreground: 210 40% 98%;
-  --card: 222 47% 9%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222 47% 9%;
-  --popover-foreground: 210 40% 98%;
+  /* ============================================
+     CATEGORY COLORS - Vivid & Distinct
+     ============================================ */
+  --color-diagnosis: 210 92% 60%;
+  --color-diagnosis-light: 210 85% 18%;
+  --color-diagnosis-glow: 210 98% 68%;
   
-  /* Component Colors */
-  --primary: 168 84% 45%;
-  --primary-foreground: 222 47% 11%;
-  --secondary: 217 33% 17%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 217 33% 14%;
-  --muted-foreground: 215 20% 65%;
-  --accent: 217 33% 17%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 98%;
+  --color-imaging: 262 78% 70%;
+  --color-imaging-light: 262 70% 18%;
+  --color-imaging-glow: 262 85% 78%;
   
-  /* Borders & Inputs */
-  --border: 217 33% 17%;
-  --input: 217 33% 17%;
-  --ring: 168 84% 45%;
+  --color-medicine: 152 72% 50%;
+  --color-medicine-light: 152 65% 18%;
+  --color-medicine-glow: 152 80% 58%;
+  
+  --color-records: 38 92% 58%;
+  --color-records-light: 38 85% 18%;
+  --color-records-glow: 38 98% 65%;
+
+  /* ============================================
+     SURFACE COLORS - Deep & Layered
+     ============================================ */
+  --background: 225 35% 5%;
+  --background-subtle: 225 32% 7%;
+  --foreground: 220 28% 96%;
+  --foreground-muted: 218 18% 58%;
+  
+  --card: 224 30% 8%;
+  --card-foreground: 220 28% 96%;
+  --card-hover: 224 28% 10%;
+  
+  --popover: 224 30% 8%;
+  --popover-foreground: 220 28% 96%;
+  
+  /* ============================================
+     COMPONENT COLORS
+     ============================================ */
+  --primary: 168 78% 52%;
+  --primary-foreground: 225 35% 5%;
+  --primary-hover: 168 75% 58%;
+  
+  --secondary: 224 25% 14%;
+  --secondary-foreground: 220 28% 96%;
+  --secondary-hover: 224 22% 18%;
+  
+  --muted: 224 22% 12%;
+  --muted-foreground: 218 18% 58%;
+  
+  --accent: 224 22% 14%;
+  --accent-foreground: 220 28% 96%;
+  
+  --destructive: 0 80% 65%;
+  --destructive-foreground: 0 0% 100%;
+  
+  /* ============================================
+     BORDERS & INPUTS
+     ============================================ */
+  --border: 224 22% 16%;
+  --border-light: 224 20% 12%;
+  --border-focus: 168 78% 52%;
+  --input: 224 22% 16%;
+  --input-focus: 168 60% 15%;
+  --ring: 168 78% 52%;
+  
+  /* ============================================
+     GRADIENT PRESETS - Glowing for Dark Mode
+     ============================================ */
+  --gradient-brand: linear-gradient(135deg, hsl(168 78% 52%), hsl(262 78% 70%));
+  --gradient-brand-soft: linear-gradient(135deg, hsl(168 60% 20%), hsl(262 60% 20%));
+  --gradient-sunrise: linear-gradient(135deg, hsl(350 82% 68%), hsl(38 92% 62%));
+  --gradient-ocean: linear-gradient(135deg, hsl(188 90% 55%), hsl(210 92% 60%));
+  --gradient-forest: linear-gradient(135deg, hsl(152 72% 50%), hsl(82 72% 55%));
+  --gradient-aurora: linear-gradient(135deg, hsl(262 78% 70%), hsl(188 90% 55%), hsl(152 72% 50%));
+  --gradient-mesh: radial-gradient(at 40% 20%, hsl(168 78% 52% / 0.2) 0px, transparent 50%),
+                   radial-gradient(at 80% 0%, hsl(262 78% 70% / 0.18) 0px, transparent 50%),
+                   radial-gradient(at 0% 50%, hsl(188 90% 55% / 0.15) 0px, transparent 50%);
 }
 
 /* ================================================
@@ -1089,6 +1258,723 @@ a:focus-visible,
   background: hsl(var(--background) / 0.7);
   backdrop-filter: blur(2px);
   border-radius: inherit;
+}
+
+/* ================================================
+   PREMIUM GLASS EFFECTS
+   ================================================ */
+
+.glass-subtle {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-default {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.dark .glass-subtle {
+  background: rgba(15, 18, 30, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dark .glass-default {
+  background: rgba(15, 18, 30, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass-strong {
+  background: rgba(15, 18, 30, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Inner highlight for glass */
+.glass-highlight {
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ================================================
+   PREMIUM TYPOGRAPHY
+   ================================================ */
+
+/* Fluid Display Sizes */
+.text-display-hero {
+  font-size: clamp(2.5rem, 6vw + 1rem, 5rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+
+.text-display-xl {
+  font-size: clamp(2.25rem, 5vw + 1rem, 4rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+
+.text-display-lg {
+  font-size: clamp(1.875rem, 4vw + 1rem, 3rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+.text-display-md {
+  font-size: clamp(1.5rem, 3vw + 0.75rem, 2.25rem);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+/* Balanced text wrapping */
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-pretty {
+  text-wrap: pretty;
+}
+
+/* Text gradient */
+.text-gradient-brand {
+  background: linear-gradient(135deg, hsl(var(--brand-primary)), hsl(var(--brand-secondary)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-animated {
+  background: linear-gradient(135deg, hsl(var(--brand-primary)), hsl(var(--brand-secondary)), hsl(var(--brand-primary)));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* ================================================
+   PREMIUM SHADOWS
+   ================================================ */
+
+.shadow-soft-sm {
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-soft-md {
+  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-soft-lg {
+  box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.12);
+}
+
+.shadow-soft-xl {
+  box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.15);
+}
+
+.dark .shadow-soft-sm {
+  box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.4);
+}
+
+.dark .shadow-soft-md {
+  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.5);
+}
+
+.dark .shadow-soft-lg {
+  box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.6);
+}
+
+.dark .shadow-soft-xl {
+  box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.7);
+}
+
+/* Glow shadows */
+.shadow-glow-primary {
+  box-shadow: 0 0 40px -10px hsl(var(--brand-primary) / 0.35);
+}
+
+.shadow-glow-secondary {
+  box-shadow: 0 0 40px -10px hsl(var(--brand-secondary) / 0.35);
+}
+
+/* ================================================
+   PREMIUM BORDERS
+   ================================================ */
+
+.border-gradient {
+  border: 1px solid transparent;
+  background: linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
+              linear-gradient(135deg, hsl(var(--border)), transparent) border-box;
+}
+
+.border-gradient-brand {
+  border: 1px solid transparent;
+  background: linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
+              linear-gradient(135deg, hsl(var(--brand-primary) / 0.5), hsl(var(--brand-secondary) / 0.5)) border-box;
+}
+
+/* ================================================
+   INTERACTIVE STATES
+   ================================================ */
+
+/* Focus ring styles */
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Interactive card */
+.interactive-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.interactive-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.15);
+  border-color: hsl(var(--brand-primary) / 0.3);
+}
+
+.dark .interactive-card:hover {
+  box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.5);
+}
+
+.interactive-card:active {
+  transform: translateY(0);
+}
+
+/* ================================================
+   VIBRANT COLOR UTILITIES - V3.0
+   Rich, eye-catching colors for visual impact
+   ================================================ */
+
+/* === Primary Brand Teal === */
+.bg-brand-primary { background-color: hsl(var(--brand-primary)); }
+.bg-brand-primary-light { background-color: hsl(var(--brand-primary-light)); }
+.bg-brand-primary-muted { background-color: hsl(var(--brand-primary-muted)); }
+.text-brand-primary { color: hsl(var(--brand-primary)); }
+.text-brand-primary-light { color: hsl(var(--brand-primary-light)); }
+.border-brand-primary { border-color: hsl(var(--brand-primary)); }
+
+/* === Secondary Purple === */
+.bg-brand-secondary { background-color: hsl(var(--brand-secondary)); }
+.bg-brand-secondary-light { background-color: hsl(var(--brand-secondary-light)); }
+.bg-brand-secondary-muted { background-color: hsl(var(--brand-secondary-muted)); }
+.text-brand-secondary { color: hsl(var(--brand-secondary)); }
+.text-brand-secondary-light { color: hsl(var(--brand-secondary-light)); }
+.border-brand-secondary { border-color: hsl(var(--brand-secondary)); }
+
+/* === Accent Colors - For Visual Pop === */
+.bg-accent-cyan { background-color: hsl(var(--accent-cyan)); }
+.bg-accent-cyan-light { background-color: hsl(var(--accent-cyan-light)); }
+.text-accent-cyan { color: hsl(var(--accent-cyan)); }
+
+.bg-accent-violet { background-color: hsl(var(--accent-violet)); }
+.bg-accent-violet-light { background-color: hsl(var(--accent-violet-light)); }
+.text-accent-violet { color: hsl(var(--accent-violet)); }
+
+.bg-accent-rose { background-color: hsl(var(--accent-rose)); }
+.bg-accent-rose-light { background-color: hsl(var(--accent-rose-light)); }
+.text-accent-rose { color: hsl(var(--accent-rose)); }
+
+.bg-accent-amber { background-color: hsl(var(--accent-amber)); }
+.bg-accent-amber-light { background-color: hsl(var(--accent-amber-light)); }
+.text-accent-amber { color: hsl(var(--accent-amber)); }
+
+.bg-accent-lime { background-color: hsl(var(--accent-lime)); }
+.bg-accent-lime-light { background-color: hsl(var(--accent-lime-light)); }
+.text-accent-lime { color: hsl(var(--accent-lime)); }
+
+/* ================================================
+   VIBRANT GRADIENTS - Beautiful Color Blends
+   ================================================ */
+
+/* Brand Gradient - Primary to Secondary */
+.gradient-brand {
+  background: linear-gradient(135deg, hsl(var(--brand-primary)), hsl(var(--brand-secondary)));
+}
+
+.gradient-brand-reverse {
+  background: linear-gradient(135deg, hsl(var(--brand-secondary)), hsl(var(--brand-primary)));
+}
+
+.gradient-brand-vertical {
+  background: linear-gradient(180deg, hsl(var(--brand-primary)), hsl(var(--brand-secondary)));
+}
+
+.gradient-brand-radial {
+  background: radial-gradient(circle at center, hsl(var(--brand-primary)), hsl(var(--brand-secondary)));
+}
+
+/* Soft Brand Gradient - Muted for backgrounds */
+.gradient-brand-soft {
+  background: linear-gradient(135deg, hsl(var(--brand-primary-muted)), hsl(var(--brand-secondary-muted)));
+}
+
+/* Sunrise Gradient - Warm & Energetic */
+.gradient-sunrise {
+  background: linear-gradient(135deg, hsl(var(--accent-rose)), hsl(var(--accent-amber)));
+}
+
+.gradient-sunrise-soft {
+  background: linear-gradient(135deg, hsl(var(--accent-rose-light)), hsl(var(--accent-amber-light)));
+}
+
+/* Ocean Gradient - Cool & Calm */
+.gradient-ocean {
+  background: linear-gradient(135deg, hsl(var(--accent-cyan)), hsl(var(--color-info)));
+}
+
+.gradient-ocean-soft {
+  background: linear-gradient(135deg, hsl(var(--accent-cyan-light) / 0.5), hsl(var(--color-info-light)));
+}
+
+/* Forest Gradient - Natural & Healthy */
+.gradient-forest {
+  background: linear-gradient(135deg, hsl(var(--color-success)), hsl(var(--accent-lime)));
+}
+
+.gradient-forest-soft {
+  background: linear-gradient(135deg, hsl(var(--color-success-light)), hsl(var(--accent-lime-light) / 0.5));
+}
+
+/* Aurora Gradient - Magical Multi-color */
+.gradient-aurora {
+  background: linear-gradient(135deg, 
+    hsl(var(--brand-secondary)), 
+    hsl(var(--accent-cyan)), 
+    hsl(var(--color-success))
+  );
+}
+
+.gradient-aurora-animated {
+  background: linear-gradient(135deg, 
+    hsl(var(--brand-secondary)), 
+    hsl(var(--accent-cyan)), 
+    hsl(var(--color-success)),
+    hsl(var(--brand-secondary))
+  );
+  background-size: 300% 300%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+/* Sunset Gradient - Warm & Romantic */
+.gradient-sunset {
+  background: linear-gradient(135deg, 
+    hsl(var(--accent-rose)), 
+    hsl(var(--accent-amber)), 
+    hsl(350 85% 70%)
+  );
+}
+
+/* Cosmic Gradient - Deep & Mysterious */
+.gradient-cosmic {
+  background: linear-gradient(135deg, 
+    hsl(262 85% 25%), 
+    hsl(var(--brand-secondary)), 
+    hsl(var(--accent-violet))
+  );
+}
+
+/* Electric Gradient - Vibrant & Energetic */
+.gradient-electric {
+  background: linear-gradient(135deg, 
+    hsl(var(--accent-cyan)), 
+    hsl(var(--brand-primary)), 
+    hsl(var(--color-success))
+  );
+}
+
+/* ================================================
+   GRADIENT TEXT STYLES
+   ================================================ */
+
+.text-gradient-brand {
+  background: linear-gradient(135deg, hsl(var(--brand-primary)), hsl(var(--brand-secondary)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-sunrise {
+  background: linear-gradient(135deg, hsl(var(--accent-rose)), hsl(var(--accent-amber)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-ocean {
+  background: linear-gradient(135deg, hsl(var(--accent-cyan)), hsl(var(--color-info)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-forest {
+  background: linear-gradient(135deg, hsl(var(--color-success)), hsl(var(--accent-lime)));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-aurora {
+  background: linear-gradient(135deg, 
+    hsl(var(--brand-secondary)), 
+    hsl(var(--accent-cyan)), 
+    hsl(var(--color-success))
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-animated {
+  background: linear-gradient(135deg, 
+    hsl(var(--brand-primary)), 
+    hsl(var(--brand-secondary)), 
+    hsl(var(--accent-cyan)),
+    hsl(var(--brand-primary))
+  );
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* ================================================
+   GLOW EFFECTS - Vibrant Light Emissions
+   ================================================ */
+
+.glow-primary {
+  box-shadow: 0 0 20px hsl(var(--brand-primary) / 0.4),
+              0 0 40px hsl(var(--brand-primary) / 0.2);
+}
+
+.glow-secondary {
+  box-shadow: 0 0 20px hsl(var(--brand-secondary) / 0.4),
+              0 0 40px hsl(var(--brand-secondary) / 0.2);
+}
+
+.glow-success {
+  box-shadow: 0 0 20px hsl(var(--color-success) / 0.4),
+              0 0 40px hsl(var(--color-success) / 0.2);
+}
+
+.glow-warning {
+  box-shadow: 0 0 20px hsl(var(--color-warning) / 0.4),
+              0 0 40px hsl(var(--color-warning) / 0.2);
+}
+
+.glow-error {
+  box-shadow: 0 0 20px hsl(var(--color-error) / 0.4),
+              0 0 40px hsl(var(--color-error) / 0.2);
+}
+
+.glow-info {
+  box-shadow: 0 0 20px hsl(var(--color-info) / 0.4),
+              0 0 40px hsl(var(--color-info) / 0.2);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 20px hsl(var(--accent-cyan) / 0.4),
+              0 0 40px hsl(var(--accent-cyan) / 0.2);
+}
+
+.glow-rose {
+  box-shadow: 0 0 20px hsl(var(--accent-rose) / 0.4),
+              0 0 40px hsl(var(--accent-rose) / 0.2);
+}
+
+/* Animated Glow */
+.glow-pulse-primary {
+  animation: glow-pulse-brand 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse-brand {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(var(--brand-primary) / 0.3),
+                0 0 40px hsl(var(--brand-primary) / 0.1);
+  }
+  50% {
+    box-shadow: 0 0 30px hsl(var(--brand-primary) / 0.5),
+                0 0 60px hsl(var(--brand-primary) / 0.25);
+  }
+}
+
+/* ================================================
+   COLORFUL BORDERS
+   ================================================ */
+
+.border-gradient-brand {
+  border: 2px solid transparent;
+  background: linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
+              linear-gradient(135deg, hsl(var(--brand-primary)), hsl(var(--brand-secondary))) border-box;
+}
+
+.border-gradient-sunrise {
+  border: 2px solid transparent;
+  background: linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
+              linear-gradient(135deg, hsl(var(--accent-rose)), hsl(var(--accent-amber))) border-box;
+}
+
+.border-gradient-ocean {
+  border: 2px solid transparent;
+  background: linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
+              linear-gradient(135deg, hsl(var(--accent-cyan)), hsl(var(--color-info))) border-box;
+}
+
+.border-gradient-aurora {
+  border: 2px solid transparent;
+  background: linear-gradient(hsl(var(--card)), hsl(var(--card))) padding-box,
+              linear-gradient(135deg, 
+                hsl(var(--brand-secondary)), 
+                hsl(var(--accent-cyan)), 
+                hsl(var(--color-success))
+              ) border-box;
+}
+
+/* ================================================
+   COLORED OVERLAYS - For Image & Card Treatments
+   ================================================ */
+
+.overlay-brand {
+  position: relative;
+}
+.overlay-brand::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    hsl(var(--brand-primary) / 0.8), 
+    hsl(var(--brand-secondary) / 0.8)
+  );
+  pointer-events: none;
+}
+
+.overlay-dark {
+  position: relative;
+}
+.overlay-dark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, 
+    transparent, 
+    hsl(var(--background) / 0.9)
+  );
+  pointer-events: none;
+}
+
+/* ================================================
+   MESH GRADIENT BACKGROUNDS
+   ================================================ */
+
+.mesh-gradient-brand {
+  background: 
+    radial-gradient(at 0% 0%, hsl(var(--brand-primary) / 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsl(var(--brand-secondary) / 0.12) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsl(var(--accent-cyan) / 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsl(var(--color-success) / 0.08) 0px, transparent 50%);
+}
+
+.mesh-gradient-cool {
+  background: 
+    radial-gradient(at 40% 20%, hsl(var(--accent-cyan) / 0.15) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, hsl(var(--color-info) / 0.12) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, hsl(var(--brand-primary) / 0.1) 0px, transparent 50%);
+}
+
+.mesh-gradient-warm {
+  background: 
+    radial-gradient(at 40% 20%, hsl(var(--accent-rose) / 0.15) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, hsl(var(--accent-amber) / 0.12) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, hsl(var(--color-warning) / 0.1) 0px, transparent 50%);
+}
+
+.dark .mesh-gradient-brand {
+  background: 
+    radial-gradient(at 0% 0%, hsl(var(--brand-primary) / 0.2) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsl(var(--brand-secondary) / 0.18) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsl(var(--accent-cyan) / 0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsl(var(--color-success) / 0.12) 0px, transparent 50%);
+}
+
+/* ================================================
+   CATEGORY-SPECIFIC COLORS
+   ================================================ */
+
+/* Diagnosis - Blue tones */
+.bg-diagnosis { background-color: hsl(var(--color-diagnosis)); }
+.bg-diagnosis-light { background-color: hsl(var(--color-diagnosis-light)); }
+.text-diagnosis { color: hsl(var(--color-diagnosis)); }
+.border-diagnosis { border-color: hsl(var(--color-diagnosis)); }
+.glow-diagnosis { box-shadow: 0 0 20px hsl(var(--color-diagnosis-glow) / 0.4); }
+
+/* Imaging - Purple tones */
+.bg-imaging { background-color: hsl(var(--color-imaging)); }
+.bg-imaging-light { background-color: hsl(var(--color-imaging-light)); }
+.text-imaging { color: hsl(var(--color-imaging)); }
+.border-imaging { border-color: hsl(var(--color-imaging)); }
+.glow-imaging { box-shadow: 0 0 20px hsl(var(--color-imaging-glow) / 0.4); }
+
+/* Medicine - Green tones */
+.bg-medicine { background-color: hsl(var(--color-medicine)); }
+.bg-medicine-light { background-color: hsl(var(--color-medicine-light)); }
+.text-medicine { color: hsl(var(--color-medicine)); }
+.border-medicine { border-color: hsl(var(--color-medicine)); }
+.glow-medicine { box-shadow: 0 0 20px hsl(var(--color-medicine-glow) / 0.4); }
+
+/* Records - Amber tones */
+.bg-records { background-color: hsl(var(--color-records)); }
+.bg-records-light { background-color: hsl(var(--color-records-light)); }
+.text-records { color: hsl(var(--color-records)); }
+.border-records { border-color: hsl(var(--color-records)); }
+.glow-records { box-shadow: 0 0 20px hsl(var(--color-records-glow) / 0.4); }
+
+/* ================================================
+   VIBRANT BADGES & CHIPS
+   ================================================ */
+
+.badge-primary {
+  background: linear-gradient(135deg, hsl(var(--brand-primary)), hsl(var(--brand-primary-light)));
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-secondary {
+  background: linear-gradient(135deg, hsl(var(--brand-secondary)), hsl(var(--brand-secondary-light)));
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-success {
+  background: linear-gradient(135deg, hsl(var(--color-success)), hsl(var(--color-success-vibrant)));
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-warning {
+  background: linear-gradient(135deg, hsl(var(--color-warning)), hsl(var(--color-warning-vibrant)));
+  color: hsl(222 47% 11%);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-error {
+  background: linear-gradient(135deg, hsl(var(--color-error)), hsl(var(--color-error-vibrant)));
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-info {
+  background: linear-gradient(135deg, hsl(var(--color-info)), hsl(var(--color-info-vibrant)));
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Outline badges - subtle but colorful */
+.badge-outline-primary {
+  background: hsl(var(--brand-primary-muted));
+  color: hsl(var(--brand-primary));
+  border: 1px solid hsl(var(--brand-primary) / 0.3);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-outline-secondary {
+  background: hsl(var(--brand-secondary-muted));
+  color: hsl(var(--brand-secondary));
+  border: 1px solid hsl(var(--brand-secondary) / 0.3);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* ================================================
+   COLORFUL ICON CONTAINERS
+   ================================================ */
+
+.icon-container-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(135deg, hsl(var(--brand-primary)), hsl(var(--brand-primary-light)));
+  border-radius: 0.75rem;
+  color: white;
+  box-shadow: 0 4px 12px hsl(var(--brand-primary) / 0.3);
+}
+
+.icon-container-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(135deg, hsl(var(--brand-secondary)), hsl(var(--brand-secondary-light)));
+  border-radius: 0.75rem;
+  color: white;
+  box-shadow: 0 4px 12px hsl(var(--brand-secondary) / 0.3);
+}
+
+.icon-container-success {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(135deg, hsl(var(--color-success)), hsl(var(--color-success-vibrant)));
+  border-radius: 0.75rem;
+  color: white;
+  box-shadow: 0 4px 12px hsl(var(--color-success) / 0.3);
+}
+
+.icon-container-muted {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: hsl(var(--muted));
+  border-radius: 0.75rem;
+  color: hsl(var(--muted-foreground));
 }
 
 /* ================================================

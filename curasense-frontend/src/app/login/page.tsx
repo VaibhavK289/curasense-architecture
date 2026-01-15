@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Mail, Lock, LogIn, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Mail, Lock, LogIn, Eye, EyeOff, UserCircle2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +15,7 @@ import { useAuth } from "@/lib/auth-context";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isLoading } = useAuth();
+  const { login, isLoading, continueAsGuest } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -40,6 +40,11 @@ export default function LoginPage() {
         setError("Login failed. Please check your credentials and try again.");
       }
     }
+  };
+
+  const handleGuestMode = () => {
+    continueAsGuest();
+    router.push("/");
   };
 
   return (
@@ -167,6 +172,38 @@ export default function LoginPage() {
                 </>
               )}
             </Button>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-[hsl(var(--border))]" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-[hsl(var(--card))] px-3 text-[hsl(var(--muted-foreground))]">
+                  or
+                </span>
+              </div>
+            </div>
+
+            {/* Guest Mode Button */}
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full gap-2 group relative overflow-hidden"
+              size="lg"
+              onClick={handleGuestMode}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--brand-primary)/0.05)] to-[hsl(var(--brand-secondary)/0.05)] opacity-0 group-hover:opacity-100 transition-opacity" />
+              <UserCircle2 className="h-4 w-4 text-[hsl(var(--brand-primary))]" />
+              <span>Continue as Guest</span>
+              <Sparkles className="h-3 w-3 text-[hsl(var(--accent-amber))] ml-1" />
+            </Button>
+
+            <p className="text-xs text-center text-[hsl(var(--muted-foreground))] mt-3">
+              Try all features without creating an account.
+              <br />
+              Your data won&apos;t be saved to cloud.
+            </p>
           </form>
         </Card>
 

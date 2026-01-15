@@ -61,7 +61,7 @@ export default function RootLayout({
             {/* Main Content Area */}
             <div className="flex flex-1 flex-col lg:pl-16 transition-all duration-300">
               <Header />
-              <SkipNavTarget className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:p-8 pb-24 lg:pb-8">
+              <SkipNavTarget className="flex-1 px-3 py-3 sm:px-4 sm:py-4 lg:px-6 lg:py-4 pb-20 lg:pb-6">
                 {children}
               </SkipNavTarget>
             </div>

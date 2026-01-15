@@ -23,6 +23,11 @@ import {
   FileDown,
   Database,
   Lock,
+  Eye,
+  EyeOff,
+  History,
+  BarChart3,
+  UserX,
 } from "lucide-react";
 import {
   Card,
@@ -64,6 +69,9 @@ interface UserSettings {
   timezone: string;
   autoDeleteDays: number;
   dataExportFormat: "json" | "csv" | "pdf";
+  anonymousMode: boolean;
+  trackHistory: boolean;
+  shareAnalytics: boolean;
 }
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -73,6 +81,9 @@ const DEFAULT_SETTINGS: UserSettings = {
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   autoDeleteDays: 0,
   dataExportFormat: "json",
+  anonymousMode: false,
+  trackHistory: true,
+  shareAnalytics: true,
 };
 
 export default function SettingsPage() {
@@ -230,6 +241,120 @@ export default function SettingsPage() {
                 </Button>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Privacy & Anonymous Mode */}
+        <Card className={cn(
+          settings.anonymousMode && "border-[hsl(var(--accent-amber)/0.5)] bg-[hsl(var(--accent-amber)/0.05)]"
+        )}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              {settings.anonymousMode ? (
+                <UserX className="h-5 w-5 text-[hsl(var(--accent-amber))]" />
+              ) : (
+                <Eye className="h-5 w-5" />
+              )}
+              Privacy & Anonymous Mode
+              {settings.anonymousMode && (
+                <span className="ml-2 text-xs font-normal px-2 py-0.5 rounded-full bg-[hsl(var(--accent-amber)/0.2)] text-[hsl(var(--accent-amber))]">
+                  Active
+                </span>
+              )}
+            </CardTitle>
+            <CardDescription>
+              Control your privacy and activity tracking preferences
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-[hsl(var(--foreground))]">
+                  Anonymous Mode
+                </p>
+                <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                  Disable all history tracking and activity logging
+                </p>
+              </div>
+              <Button
+                variant={settings.anonymousMode ? "default" : "outline"}
+                size="sm"
+                onClick={() => {
+                  const newValue = !settings.anonymousMode;
+                  updateSetting("anonymousMode", newValue);
+                  if (newValue) {
+                    updateSetting("trackHistory", false);
+                    updateSetting("shareAnalytics", false);
+                    toast.info("Anonymous mode enabled - no activity will be tracked");
+                  } else {
+                    updateSetting("trackHistory", true);
+                    toast.success("Anonymous mode disabled");
+                  }
+                }}
+                className={cn(
+                  "gap-2",
+                  settings.anonymousMode && "bg-[hsl(var(--accent-amber))] hover:bg-[hsl(var(--accent-amber)/0.9)]"
+                )}
+              >
+                {settings.anonymousMode ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+                {settings.anonymousMode ? "Enabled" : "Disabled"}
+              </Button>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-[hsl(var(--foreground))]">
+                  Activity History
+                </p>
+                <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                  Track your report history and recent activity
+                </p>
+              </div>
+              <Button
+                variant={settings.trackHistory ? "default" : "outline"}
+                size="sm"
+                onClick={() => updateSetting("trackHistory", !settings.trackHistory)}
+                disabled={settings.anonymousMode}
+                className="gap-2"
+              >
+                <History className="h-4 w-4" />
+                {settings.trackHistory ? "Tracking" : "Off"}
+              </Button>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-[hsl(var(--foreground))]">
+                  Share Usage Analytics
+                </p>
+                <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                  Help improve CuraSense with anonymous analytics
+                </p>
+              </div>
+              <Button
+                variant={settings.shareAnalytics ? "default" : "outline"}
+                size="sm"
+                onClick={() => updateSetting("shareAnalytics", !settings.shareAnalytics)}
+                disabled={settings.anonymousMode}
+                className="gap-2"
+              >
+                <BarChart3 className="h-4 w-4" />
+                {settings.shareAnalytics ? "Sharing" : "Off"}
+              </Button>
+            </div>
+            {settings.anonymousMode && (
+              <div className="p-3 rounded-lg bg-[hsl(var(--accent-amber)/0.1)] border border-[hsl(var(--accent-amber)/0.3)]">
+                <p className="text-sm text-[hsl(var(--accent-amber))] flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  <span>
+                    <strong>Anonymous Mode Active:</strong> Your activity is not being tracked. 
+                    Reports are still saved but won't appear in your history.
+                  </span>
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 

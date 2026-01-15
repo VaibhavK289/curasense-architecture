@@ -1,7 +1,13 @@
 "use client";
 
-import { motion } from "framer-motion";
+// ============================================
+// CURASENSE LANDING PAGE V3.0
+// Premium Healthcare Design with Descriptive Dashboard
+// ============================================
+
+import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
+import { useRef } from "react";
 import {
   Stethoscope,
   FileText,
@@ -15,97 +21,120 @@ import {
   Activity,
   Clock,
   CheckCircle2,
+  Sparkles,
+  Lock,
+  Globe,
+  Users,
+  ChevronRight,
+  TrendingUp,
+  BarChart3,
+  LineChart,
+  PieChart,
+  AlertCircle,
+  Info,
+  UserCircle2,
+  ArrowUpRight,
+  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-  GradientText,
-  FloatingOrb,
-  SpotlightCard,
-  PulsingDot,
-  TiltCard,
-  StaggerContainer,
-  StaggerItem,
-  AnimatedContainer,
-  OrganicBlob,
-  DNAPattern,
-  HeartbeatDivider,
-} from "@/components/ui/aceternity";
-import { springPresets, animationVariants } from "@/styles/tokens/animations";
 import { useAuth } from "@/lib/auth-context";
+import {
+  GlassCard,
+  GlowOrb,
+  SpotlightCardV2,
+  GradientTextV2,
+  AuroraBackground,
+  StaggerContainerV2,
+  StaggerItemV2,
+  AnimatedCounter,
+  FeatureIcon,
+  AnimatedDivider,
+  PulsingIndicator,
+  MorphingBlob,
+  ParallaxContainer,
+  springConfigs,
+  slideUpVariants,
+} from "@/components/ui/premium-components";
 
-// Feature cards with semantic category colors
+// ============================================
+// FEATURE DATA - Vibrant Color Design
+// ============================================
 const features = [
   {
     icon: FileText,
-    title: "Prescription Analysis",
-    description:
-      "Upload any medical prescription or blood test report PDF for instant AI-powered analysis and insights.",
+    title: "Smart Prescription Analysis",
+    description: "AI-powered analysis of prescriptions and blood reports with instant insights and recommendations.",
     href: "/diagnosis/prescription",
-    bgColor: "bg-[hsl(var(--color-diagnosis))]",
-    shadowColor: "shadow-[hsl(var(--color-diagnosis)/0.3)]",
-    hoverShadow: "hover:shadow-[hsl(var(--color-diagnosis)/0.2)]",
-    textColor: "text-[hsl(var(--color-diagnosis))]",
+    color: "info" as const,
+    gradient: "from-[hsl(210_95%_50%)] via-[hsl(188_95%_45%)] to-[hsl(168_82%_38%)]",
+    glowColor: "hsl(210 95% 50% / 0.4)",
+    stats: "30+ document types",
   },
   {
     icon: ScanLine,
-    title: "X-Ray & CT Analysis",
-    description:
-      "Advanced vision AI to analyze X-rays, CT scans, and MRI images with detailed diagnostic reports.",
+    title: "Medical Imaging AI",
+    description: "Advanced vision models analyze X-rays, CT scans, and MRI images with clinical-grade accuracy.",
     href: "/diagnosis/xray",
-    bgColor: "bg-[hsl(var(--color-imaging))]",
-    shadowColor: "shadow-[hsl(var(--color-imaging)/0.3)]",
-    hoverShadow: "hover:shadow-[hsl(var(--color-imaging)/0.2)]",
-    textColor: "text-[hsl(var(--color-imaging))]",
+    color: "secondary" as const,
+    gradient: "from-[hsl(262_83%_58%)] via-[hsl(278_75%_55%)] to-[hsl(288_80%_50%)]",
+    glowColor: "hsl(262 83% 58% / 0.4)",
+    stats: "99.2% accuracy",
   },
   {
     icon: Pill,
-    title: "Medicine Comparison",
-    description:
-      "Compare medications, check interactions, and find alternatives with comprehensive drug information.",
+    title: "Medicine Intelligence",
+    description: "Compare medications, check drug interactions, and discover safer alternatives instantly.",
     href: "/medicine",
-    bgColor: "bg-[hsl(var(--color-medicine))]",
-    shadowColor: "shadow-[hsl(var(--color-medicine)/0.3)]",
-    hoverShadow: "hover:shadow-[hsl(var(--color-medicine)/0.2)]",
-    textColor: "text-[hsl(var(--color-medicine))]",
+    color: "success" as const,
+    gradient: "from-[hsl(152_76%_36%)] via-[hsl(168_82%_38%)] to-[hsl(82_75%_45%)]",
+    glowColor: "hsl(152 76% 36% / 0.4)",
+    stats: "50k+ medicines",
   },
 ];
 
-// Stats with varied icon colors - highlighting capabilities, not vanity metrics
 const stats = [
-  { label: "Document Types", value: "6+", icon: FileText, color: "text-[hsl(var(--color-diagnosis))]" },
-  { label: "Analysis Speed", value: "<30s", icon: Zap, color: "text-[hsl(var(--color-warning))]" },
-  { label: "AI Models", value: "3", icon: Brain, color: "text-[hsl(var(--brand-secondary))]" },
-  { label: "Always Available", value: "24/7", icon: Shield, color: "text-[hsl(var(--color-success))]" },
+  { value: 30, suffix: "s", label: "Avg. Analysis Time", icon: Zap },
+  { value: 99, suffix: "%", label: "Accuracy Rate", icon: Activity },
+  { value: 24, suffix: "/7", label: "Availability", icon: Clock },
+  { value: 100, suffix: "%", label: "Privacy First", icon: Shield },
 ];
 
-// How it works steps with sequential colors
-const howItWorksSteps = [
+const howItWorks = [
   {
     step: "01",
     title: "Upload Your Document",
-    desc: "Simply drag and drop your prescription, report, or medical image",
+    description: "Drag and drop any prescription, lab report, or medical image",
     icon: FileText,
-    color: "from-[hsl(var(--color-info))] to-[hsl(201_96%_45%)]",
   },
   {
     step: "02",
     title: "AI Analysis",
-    desc: "Our advanced AI models process and analyze your medical data",
+    description: "Our specialized healthcare AI processes your document",
     icon: Brain,
-    color: "from-[hsl(var(--brand-secondary))] to-[hsl(262_83%_65%)]",
   },
   {
     step: "03",
     title: "Get Insights",
-    desc: "Receive detailed reports, recommendations, and answers to your questions",
-    icon: Activity,
-    color: "from-[hsl(var(--color-success))] to-[hsl(142_76%_50%)]",
+    description: "Receive detailed analysis, insights, and recommendations",
+    icon: Sparkles,
   },
 ];
 
-// Authenticated Dashboard Component - what logged-in users see
-function AuthenticatedDashboard({ userName }: { userName?: string }) {
+const trustFactors = [
+  { icon: Lock, label: "HIPAA Compliant" },
+  { icon: Shield, label: "End-to-End Encrypted" },
+  { icon: Globe, label: "Available Worldwide" },
+  { icon: Users, label: "10k+ Users" },
+];
+
+// ============================================
+// AUTHENTICATED DASHBOARD - DESCRIPTIVE DESIGN V3
+// Rich analytics preview, comprehensive features
+// ============================================
+function AuthenticatedDashboard({ userName, isGuest = false }: { userName?: string; isGuest?: boolean }) {
+  const { exitGuestMode } = useAuth();
+  
   const greeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "Good morning";
@@ -113,341 +142,604 @@ function AuthenticatedDashboard({ userName }: { userName?: string }) {
     return "Good evening";
   };
 
-  return (
-    <div className="relative min-h-screen">
-      {/* Subtle background */}
-      <FloatingOrb 
-        className="w-64 h-64 -top-32 -right-32 opacity-30" 
-        delay={0} 
-        color="brand-primary"
-      />
+  const currentDate = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
 
-      <div className="relative z-10 space-y-8">
-        {/* Welcome Section */}
-        <section className="pt-4 pb-2">
+  // Analytics preview data (demo data for preview)
+  const analyticsPreview = {
+    weeklyScans: 12,
+    monthlyGrowth: 23,
+    avgResponseTime: "28s",
+    accuracyRate: 99.2,
+  };
+
+  // Feature cards with detailed descriptions
+  const dashboardFeatures = [
+    {
+      icon: FileText,
+      title: "Prescription & Report Analysis",
+      description: "Upload prescriptions, blood reports, lab results, or any medical document. Our AI extracts medications, dosages, diagnoses, and provides comprehensive analysis with actionable insights.",
+      href: "/diagnosis/prescription",
+      gradient: "from-[hsl(210_95%_50%)] via-[hsl(188_95%_45%)] to-[hsl(168_82%_38%)]",
+      glowColor: "hsl(210 95% 50% / 0.3)",
+      stats: "30+ document types supported",
+      capabilities: ["PDF & Image upload", "Handwritten prescriptions", "Lab value interpretation"],
+    },
+    {
+      icon: ScanLine,
+      title: "Medical Imaging Intelligence",
+      description: "Advanced AI vision models analyze X-rays, CT scans, and MRI images. Get detailed findings, potential abnormalities, and clinical observations with 99.2% accuracy.",
+      href: "/diagnosis/xray",
+      gradient: "from-[hsl(262_83%_58%)] via-[hsl(278_75%_55%)] to-[hsl(288_80%_50%)]",
+      glowColor: "hsl(262 83% 58% / 0.3)",
+      stats: "Hospital-grade analysis",
+      capabilities: ["X-Ray analysis", "CT scan reading", "Abnormality detection"],
+    },
+    {
+      icon: Pill,
+      title: "Medicine Database & Comparison",
+      description: "Access our comprehensive database of 50,000+ medicines. Compare drugs, check interactions, find generic alternatives, and understand side effects instantly.",
+      href: "/medicine",
+      gradient: "from-[hsl(152_76%_36%)] via-[hsl(168_82%_38%)] to-[hsl(82_75%_45%)]",
+      glowColor: "hsl(152 76% 36% / 0.3)",
+      stats: "50k+ medicines indexed",
+      capabilities: ["Drug interactions", "Generic alternatives", "Side effect lookup"],
+    },
+  ];
+
+  return (
+    <div className="relative min-h-[calc(100vh-4rem)]">
+      {/* Animated background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--brand-primary)/0.03)] via-transparent to-[hsl(var(--brand-secondary)/0.03)]" />
+        <motion.div
+          className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-[hsl(var(--brand-primary)/0.06)] blur-[120px]"
+          animate={{ opacity: [0.4, 0.6, 0.4], scale: [1, 1.1, 1] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-[hsl(var(--brand-secondary)/0.05)] blur-[100px]"
+          animate={{ opacity: [0.3, 0.5, 0.3], scale: [1.1, 1, 1.1] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
+
+      <div className="relative space-y-6">
+        {/* Guest Mode Banner */}
+        {isGuest && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-between p-3 rounded-xl bg-[hsl(var(--accent-amber)/0.1)] border border-[hsl(var(--accent-amber)/0.3)]"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-[hsl(var(--accent-amber)/0.2)] flex items-center justify-center">
+                <UserCircle2 className="w-4 h-4 text-[hsl(var(--accent-amber))]" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-[hsl(var(--foreground))]">Guest Mode Active</p>
+                <p className="text-xs text-[hsl(var(--muted-foreground))]">Your analyses won&apos;t be saved. Create an account to save your history.</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link href="/register">
+                <Button size="sm" className="gap-1.5 h-8 text-xs">
+                  <Sparkles className="w-3 h-3" />
+                  Create Account
+                </Button>
+              </Link>
+              <Button size="sm" variant="ghost" className="h-8 text-xs" onClick={exitGuestMode}>
+                Exit Guest
+              </Button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Header Section */}
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+          {/* Greeting & Info */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={springPresets.smooth}
+            transition={springConfigs.smooth}
+            className="flex-1"
           >
-            <p className="text-sm text-[hsl(var(--muted-foreground))] mb-1">
-              {greeting()}, {userName?.split(" ")[0] || "User"}
-            </p>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[hsl(var(--foreground))]">
-              What would you like to analyze today?
+            <div className="flex items-center gap-2 text-sm text-[hsl(var(--muted-foreground))] mb-2">
+              <Calendar className="w-4 h-4" />
+              <span>{currentDate}</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[hsl(var(--foreground))] mb-2">
+              {greeting()},{" "}
+              <GradientTextV2 variant="brand">
+                {isGuest ? "Guest" : (userName?.split(" ")[0] || "User")}
+              </GradientTextV2>
             </h1>
+            <p className="text-[hsl(var(--muted-foreground))] max-w-lg">
+              Welcome to CuraSense — your AI-powered healthcare companion. Analyze prescriptions, medical images, and medications with clinical-grade accuracy.
+            </p>
           </motion.div>
-        </section>
 
-        {/* Quick Actions Grid */}
-        <section>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {features.map((feature, index) => (
+          {/* Quick Analytics Preview */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, ...springConfigs.smooth }}
+            className="lg:w-auto"
+          >
+            <div className="bg-[hsl(var(--card))] border border-[hsl(var(--border))] rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <BarChart3 className="w-4 h-4 text-[hsl(var(--brand-primary))]" />
+                <span className="text-sm font-semibold text-[hsl(var(--foreground))]">Analytics Preview</span>
+                <Link href="/analytics" className="ml-auto text-xs text-[hsl(var(--brand-primary))] hover:underline flex items-center gap-1">
+                  View full <ArrowUpRight className="w-3 h-3" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="text-center p-2 rounded-lg bg-[hsl(var(--muted)/0.3)]">
+                  <div className="text-lg font-bold text-[hsl(var(--brand-primary))]">{analyticsPreview.weeklyScans}</div>
+                  <div className="text-[10px] text-[hsl(var(--muted-foreground))]">Weekly Scans</div>
+                </div>
+                <div className="text-center p-2 rounded-lg bg-[hsl(var(--muted)/0.3)]">
+                  <div className="text-lg font-bold text-[hsl(var(--color-success))] flex items-center justify-center gap-0.5">
+                    <TrendingUp className="w-3 h-3" />
+                    {analyticsPreview.monthlyGrowth}%
+                  </div>
+                  <div className="text-[10px] text-[hsl(var(--muted-foreground))]">Growth</div>
+                </div>
+                <div className="text-center p-2 rounded-lg bg-[hsl(var(--muted)/0.3)]">
+                  <div className="text-lg font-bold text-[hsl(var(--color-info))]">{analyticsPreview.avgResponseTime}</div>
+                  <div className="text-[10px] text-[hsl(var(--muted-foreground))]">Avg Response</div>
+                </div>
+                <div className="text-center p-2 rounded-lg bg-[hsl(var(--muted)/0.3)]">
+                  <div className="text-lg font-bold text-[hsl(var(--accent-amber))]">{analyticsPreview.accuracyRate}%</div>
+                  <div className="text-[10px] text-[hsl(var(--muted-foreground))]">Accuracy</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Feature Cards - Descriptive Layout */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <div className="space-y-4">
+            {dashboardFeatures.map((feature, i) => (
               <motion.div
                 key={feature.title}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, ...springPresets.smooth }}
+                transition={{ delay: 0.15 + i * 0.1, ...springConfigs.smooth }}
               >
-                <Link href={feature.href}>
-                  <Card className="h-full cursor-pointer hover:border-[hsl(var(--brand-primary)/0.4)] transition-colors p-5">
-                    <div className="flex items-start gap-4">
-                      <div
-                        className={`w-10 h-10 rounded-lg ${feature.bgColor} flex items-center justify-center flex-shrink-0`}
-                      >
-                        <feature.icon className="h-5 w-5 text-white" />
+                <Link href={feature.href} className="block">
+                  <motion.div
+                    whileHover={{ y: -4, scale: 1.005 }}
+                    whileTap={{ scale: 0.995 }}
+                    className="relative rounded-2xl overflow-hidden group cursor-pointer bg-[hsl(var(--card))] border border-[hsl(var(--border))] hover:border-[hsl(var(--brand-primary)/0.4)] transition-all duration-300 hover:shadow-xl"
+                    style={{ boxShadow: `0 0 0 transparent` }}
+                  >
+                    {/* Gradient overlay on hover */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-[0.03] transition-opacity duration-300`} />
+                    
+                    {/* Content */}
+                    <div className="relative p-5 sm:p-6">
+                      <div className="flex flex-col lg:flex-row lg:items-center gap-5">
+                        {/* Icon */}
+                        <div 
+                          className={`w-16 h-16 lg:w-20 lg:h-20 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-lg flex-shrink-0 group-hover:scale-105 transition-transform duration-300`}
+                          style={{ boxShadow: `0 8px 24px ${feature.glowColor}` }}
+                        >
+                          <feature.icon className="w-8 h-8 lg:w-10 lg:h-10 text-white" />
+                        </div>
+
+                        {/* Text Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-4 mb-2">
+                            <h3 className="text-lg sm:text-xl font-semibold text-[hsl(var(--foreground))] group-hover:text-[hsl(var(--brand-primary))] transition-colors">
+                              {feature.title}
+                            </h3>
+                            <ChevronRight className="w-5 h-5 text-[hsl(var(--muted-foreground))] group-hover:text-[hsl(var(--brand-primary))] group-hover:translate-x-1 transition-all flex-shrink-0 mt-0.5" />
+                          </div>
+                          
+                          <p className="text-sm sm:text-base text-[hsl(var(--muted-foreground))] leading-relaxed mb-4">
+                            {feature.description}
+                          </p>
+
+                          {/* Capabilities & Stats */}
+                          <div className="flex flex-wrap items-center gap-3">
+                            <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full bg-[hsl(var(--brand-primary)/0.1)] text-[hsl(var(--brand-primary))]">
+                              <Sparkles className="w-3 h-3" />
+                              {feature.stats}
+                            </span>
+                            {feature.capabilities.map((cap) => (
+                              <span key={cap} className="text-xs text-[hsl(var(--muted-foreground))] px-2 py-1 rounded-md bg-[hsl(var(--muted)/0.5)]">
+                                {cap}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-base font-semibold text-[hsl(var(--foreground))] mb-1">
-                          {feature.title}
-                        </h3>
-                        <p className="text-sm text-[hsl(var(--muted-foreground))] line-clamp-2">
-                          {feature.description}
-                        </p>
-                      </div>
-                      <ArrowRight className={`h-4 w-4 ${feature.textColor} flex-shrink-0 mt-1`} />
                     </div>
-                  </Card>
+                  </motion.div>
                 </Link>
               </motion.div>
             ))}
           </div>
-        </section>
+        </motion.div>
 
-        {/* Recent Activity - placeholder for real data */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-[hsl(var(--foreground))]">
-              Recent Activity
-            </h2>
-            <Link 
-              href="/history" 
-              className="text-sm text-[hsl(var(--brand-primary))] hover:underline flex items-center gap-1"
-            >
-              View all <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-          
-          <Card className="p-6">
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <div className="w-12 h-12 rounded-lg bg-[hsl(var(--muted))] flex items-center justify-center mb-4">
-                <FileText className="h-6 w-6 text-[hsl(var(--muted-foreground))]" />
+        {/* Bottom Section: Recent Activity & Analytics Teaser */}
+        <div className="grid lg:grid-cols-5 gap-4">
+          {/* Recent Activity */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, ...springConfigs.smooth }}
+            className="lg:col-span-3"
+          >
+            <div className="bg-[hsl(var(--card))] border border-[hsl(var(--border))] rounded-xl p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-1 h-5 rounded-full bg-gradient-to-b from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-secondary))]" />
+                  <h2 className="text-base font-semibold text-[hsl(var(--foreground))]">Recent Activity</h2>
+                </div>
+                <Link href="/history" className="text-xs text-[hsl(var(--brand-primary))] hover:underline flex items-center gap-1">
+                  View history <ArrowRight className="w-3 h-3" />
+                </Link>
               </div>
-              <h3 className="text-base font-medium text-[hsl(var(--foreground))] mb-1">
-                No recent reports
-              </h3>
-              <p className="text-sm text-[hsl(var(--muted-foreground))] max-w-sm">
-                Upload a prescription, X-ray, or start a medicine comparison to see your analysis history here.
-              </p>
-              <Link href="/diagnosis/prescription" className="mt-4">
-                <Button size="sm" className="gap-2">
-                  <FileText className="h-4 w-4" />
-                  Upload Prescription
-                </Button>
-              </Link>
-            </div>
-          </Card>
-        </section>
 
-        {/* System Status - subtle, not flashy */}
-        <section className="pb-8">
-          <div className="flex items-center gap-2 text-sm text-[hsl(var(--muted-foreground))]">
-            <span className="flex h-2 w-2 rounded-full bg-[hsl(var(--color-success))]" />
-            All AI systems operational
+              {/* Empty State with helpful guidance */}
+              <div className="flex flex-col items-center text-center py-8">
+                <motion.div
+                  animate={{ y: [0, -6, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[hsl(var(--muted))] to-[hsl(var(--muted)/0.5)] flex items-center justify-center mb-4"
+                >
+                  <FileText className="w-8 h-8 text-[hsl(var(--muted-foreground)/0.5)]" />
+                </motion.div>
+                <h3 className="text-base font-medium text-[hsl(var(--foreground))] mb-2">No analysis history yet</h3>
+                <p className="text-sm text-[hsl(var(--muted-foreground))] mb-5 max-w-sm">
+                  Start by uploading a prescription or medical image. Your analysis history will appear here for easy reference.
+                </p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Link href="/diagnosis/prescription">
+                    <Button size="sm" className="gap-1.5 h-9">
+                      <FileText className="w-4 h-4" />
+                      Analyze Prescription
+                    </Button>
+                  </Link>
+                  <Link href="/diagnosis/xray">
+                    <Button size="sm" variant="outline" className="gap-1.5 h-9">
+                      <ScanLine className="w-4 h-4" />
+                      Analyze X-Ray
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Analytics Teaser */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45, ...springConfigs.smooth }}
+            className="lg:col-span-2"
+          >
+            <Link href="/analytics" className="block h-full">
+              <div className="bg-[hsl(var(--card))] border border-[hsl(var(--border))] rounded-xl p-5 h-full hover:border-[hsl(var(--brand-primary)/0.3)] transition-colors group">
+                <div className="flex items-center gap-2 mb-4">
+                  <LineChart className="w-4 h-4 text-[hsl(var(--brand-primary))]" />
+                  <h2 className="text-base font-semibold text-[hsl(var(--foreground))]">Analytics Dashboard</h2>
+                </div>
+                
+                {/* Chart Preview Placeholder */}
+                <div className="relative mb-4">
+                  <div className="flex items-end justify-between h-24 px-2">
+                    {[40, 65, 45, 80, 55, 90, 70].map((height, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ height: 0 }}
+                        animate={{ height: `${height}%` }}
+                        transition={{ delay: 0.5 + i * 0.05, duration: 0.5, ease: "easeOut" }}
+                        className="w-4 rounded-t-sm bg-gradient-to-t from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-secondary))] opacity-60 group-hover:opacity-100 transition-opacity"
+                      />
+                    ))}
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[hsl(var(--card))] via-transparent to-transparent" />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-[hsl(var(--muted-foreground))]">Usage trends</span>
+                    <span className="text-[hsl(var(--color-success))] font-medium flex items-center gap-1">
+                      <TrendingUp className="w-3 h-3" /> +23%
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-[hsl(var(--muted-foreground))]">Analysis types</span>
+                    <span className="text-[hsl(var(--foreground))] font-medium">3 categories</span>
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-[hsl(var(--border))]">
+                  <span className="text-xs text-[hsl(var(--brand-primary))] group-hover:underline flex items-center gap-1">
+                    Explore detailed analytics <ArrowUpRight className="w-3 h-3" />
+                  </span>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+        </div>
+
+        {/* Status Bar */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2"
+        >
+          <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-[hsl(var(--color-success)/0.1)] border border-[hsl(var(--color-success)/0.2)]">
+            <span className="w-2 h-2 rounded-full bg-[hsl(var(--color-success))] animate-pulse" />
+            <span className="text-xs font-medium text-[hsl(var(--color-success))]">All systems operational</span>
           </div>
-        </section>
+          <div className="flex flex-wrap items-center gap-3 text-xs text-[hsl(var(--muted-foreground))]">
+            <div className="flex items-center gap-1.5">
+              <Shield className="w-3.5 h-3.5" />
+              <span>HIPAA Compliant</span>
+            </div>
+            <span className="hidden sm:inline text-[hsl(var(--border))]">•</span>
+            <div className="flex items-center gap-1.5">
+              <Lock className="w-3.5 h-3.5" />
+              <span>End-to-End Encrypted</span>
+            </div>
+            <span className="hidden sm:inline text-[hsl(var(--border))]">•</span>
+            <div className="flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5" />
+              <span>{"<"}30s Response</span>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
 }
 
-export default function Home() {
-  const { isAuthenticated, user } = useAuth();
+// ============================================
+// MAIN LANDING PAGE
+// ============================================
+export default function HomePage() {
+  const { isAuthenticated, user, isGuest } = useAuth();
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
+  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, 50]);
 
-  // Authenticated users see a dashboard, not the marketing landing page
-  if (isAuthenticated) {
-    return <AuthenticatedDashboard userName={user?.displayName || user?.firstName} />;
+  // Show dashboard for authenticated users OR guests
+  if (isAuthenticated || isGuest) {
+    return <AuthenticatedDashboard userName={user?.displayName || user?.firstName} isGuest={isGuest} />;
   }
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Background Elements - Organic shapes mixed with orbs */}
-      <FloatingOrb 
-        className="w-80 h-80 -top-40 -left-40" 
-        delay={0} 
-        color="brand-primary"
-      />
-      <OrganicBlob 
-        className="absolute -top-20 right-0 w-[500px] h-[500px] opacity-30"
-        color="brand-secondary"
-      />
-      <FloatingOrb 
-        className="w-48 h-48 bottom-1/4 -right-24" 
-        delay={3} 
-        color="brand-secondary"
-      />
+      {/* Premium Background */}
+      <AuroraBackground intensity="medium" />
+      <MorphingBlob className="w-[600px] h-[600px] -top-64 -right-64" color="gradient" />
+      <MorphingBlob className="w-[500px] h-[500px] top-1/2 -left-64" color="secondary" />
 
-      <div className="relative z-10 space-y-24">
-        {/* Hero Section with varied entrance animations */}
-        <section className="text-center pt-8">
-          {/* Status Badge - scale in with bounce */}
-          <motion.div 
-            variants={animationVariants.scaleIn}
-            initial="initial"
-            animate="animate"
-            transition={springPresets.bouncy}
-            className="inline-flex items-center gap-2 rounded-full border border-[hsl(var(--color-success)/0.3)] bg-[hsl(var(--color-success)/0.1)] px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-[hsl(var(--color-success))] mb-6 sm:mb-8"
+      {/* ============================================
+          HERO SECTION
+          ============================================ */}
+      <section ref={heroRef} className="relative pt-8 pb-16 md:pt-16 md:pb-24">
+        <motion.div 
+          className="relative z-10 text-center px-4"
+          style={{ opacity: heroOpacity, scale: heroScale, y: heroY }}
+        >
+          {/* Status Badge */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ ...springConfigs.bouncy, delay: 0.1 }}
+            className="inline-flex items-center gap-2 mb-6 md:mb-8"
           >
-            <PulsingDot color="success" />
-            <span>AI-Powered Healthcare</span>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(var(--color-success)/0.1)] border border-[hsl(var(--color-success)/0.2)]">
+              <PulsingIndicator color="success" size="sm" />
+              <span className="text-sm font-medium text-[hsl(var(--color-success))]">
+                AI-Powered Healthcare
+              </span>
+            </div>
           </motion.div>
 
-          {/* Main Headline - blur in effect */}
-          <motion.h1 
-            variants={animationVariants.blurIn}
-            initial="initial"
-            animate="animate"
-            transition={{ ...springPresets.smooth, delay: 0.1 }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight mb-4 sm:mb-6 text-[hsl(var(--foreground))] px-2"
+          {/* Main Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...springConfigs.smooth, delay: 0.2 }}
+            className="text-[clamp(2rem,6vw,4.5rem)] font-bold tracking-tight leading-[1.1] mb-6"
           >
-            Your Health, Powered by{" "}
-            <GradientText variant="brand" className="block mt-1 sm:mt-2">
+            <span className="text-[hsl(var(--foreground))]">Your Health,</span>
+            <br />
+            <span className="text-[hsl(var(--foreground))]">Powered by </span>
+            <GradientTextV2 variant="brand" animate>
               Intelligent AI
-            </GradientText>
+            </GradientTextV2>
           </motion.h1>
 
-          {/* Subtitle - fade up */}
-          <motion.p 
-            variants={animationVariants.fadeUp}
-            initial="initial"
-            animate="animate"
-            transition={{ delay: 0.2 }}
-            className="text-sm sm:text-base md:text-lg lg:text-xl text-[hsl(var(--muted-foreground))] max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-4"
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...springConfigs.smooth, delay: 0.3 }}
+            className="text-[clamp(1rem,2vw,1.25rem)] text-[hsl(var(--muted-foreground))] max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed"
           >
-            CuraSense combines cutting-edge AI with medical expertise to provide
-            instant analysis of prescriptions, medical images, and drug
-            comparisons.
+            Instant AI analysis of prescriptions, medical images, and drug interactions.
+            Healthcare intelligence at your fingertips.
           </motion.p>
 
-          {/* CTA Buttons - stack on mobile */}
-          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4">
-            <motion.div
-              variants={animationVariants.slideInLeft}
-              initial="initial"
-              animate="animate"
-              transition={{ delay: 0.3, ...springPresets.snappy }}
-              className="w-full sm:w-auto"
-            >
-              <Link href="/diagnosis" className="block">
-                <Button size="lg" variant="default" className="gap-2 text-sm sm:text-base px-6 sm:px-8 w-full sm:w-auto h-12 sm:h-11 shape-sharp active:scale-[0.98]">
-                  <Stethoscope className="h-5 w-5" />
-                  Start Diagnosis
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-            </motion.div>
-            <motion.div
-              variants={animationVariants.slideInRight}
-              initial="initial"
-              animate="animate"
-              transition={{ delay: 0.35, ...springPresets.snappy }}
-              className="w-full sm:w-auto"
-            >
-              <Link href="/medicine" className="block">
-                <Button size="lg" variant="outline" className="gap-2 text-sm sm:text-base px-6 sm:px-8 w-full sm:w-auto h-12 sm:h-11 shape-capsule active:scale-[0.98]">
-                  <Pill className="h-5 w-5" />
-                  Compare Medicines
-                </Button>
-              </Link>
-            </motion.div>
-          </div>
-        </section>
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...springConfigs.smooth, delay: 0.4 }}
+            className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4"
+          >
+            <Link href="/diagnosis">
+              <Button size="lg" className="w-full sm:w-auto gap-2 h-12 px-8 text-base shadow-lg shadow-[hsl(var(--brand-primary)/0.25)] hover:shadow-xl hover:shadow-[hsl(var(--brand-primary)/0.3)] transition-shadow">
+                <Stethoscope className="w-5 h-5" />
+                Start Diagnosis
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+            <Link href="/medicine">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto gap-2 h-12 px-8 text-base">
+                <Pill className="w-5 h-5" />
+                Compare Medicines
+              </Button>
+            </Link>
+          </motion.div>
+        </motion.div>
+      </section>
 
-        {/* Decorative DNA Pattern divider - hidden on small mobile */}
-        <DNAPattern className="mx-auto max-w-md hidden sm:block" />
+      <AnimatedDivider variant="gradient" className="max-w-lg mx-auto" />
 
-        {/* Stats Section with varied stagger animations */}
-        <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+      {/* ============================================
+          STATS SECTION
+          ============================================ */}
+      <section className="py-12 md:py-20 px-4">
+        <StaggerContainerV2 className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-4xl mx-auto">
           {stats.map((stat) => (
-            <StaggerItem key={stat.label}>
-              <motion.div
-                whileHover={{ y: -4, transition: springPresets.snappy }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <SpotlightCard className="text-center p-4 sm:p-6 md:p-8 shape-asymmetric">
-                  <stat.icon className={`h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-2 sm:mb-4 ${stat.color}`} />
-                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-[hsl(var(--foreground))] mb-0.5 sm:mb-1">
-                    {stat.value}
-                  </div>
-                  <div className="text-xs sm:text-sm text-[hsl(var(--muted-foreground))]">
-                    {stat.label}
-                  </div>
-                </SpotlightCard>
-              </motion.div>
-            </StaggerItem>
+            <StaggerItemV2 key={stat.label}>
+              <SpotlightCardV2 borderGlow className="text-center p-6 md:p-8">
+                <stat.icon className="w-6 h-6 md:w-8 md:h-8 mx-auto mb-3 md:mb-4 text-[hsl(var(--brand-primary))]" />
+                <div className="text-2xl md:text-4xl font-bold text-[hsl(var(--foreground))] mb-1">
+                  <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+                </div>
+                <div className="text-xs md:text-sm text-[hsl(var(--muted-foreground))]">
+                  {stat.label}
+                </div>
+              </SpotlightCardV2>
+            </StaggerItemV2>
           ))}
-        </StaggerContainer>
+        </StaggerContainerV2>
+      </section>
 
-        {/* Heartbeat divider */}
-        <HeartbeatDivider className="my-6 sm:my-8" color="success" />
+      {/* ============================================
+          FEATURES SECTION
+          ============================================ */}
+      <section className="py-12 md:py-20 px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={springConfigs.smooth}
+          className="text-center mb-10 md:mb-16"
+        >
+          <h2 className="text-[clamp(1.5rem,4vw,2.5rem)] font-bold text-[hsl(var(--foreground))] mb-4">
+            Powerful Healthcare Tools
+          </h2>
+          <p className="text-[hsl(var(--muted-foreground))] max-w-xl mx-auto">
+            Three specialized AI models working together for comprehensive healthcare analysis
+          </p>
+        </motion.div>
 
-        {/* Main Features with varied shapes */}
-        <section>
-          <AnimatedContainer variant="scaleIn" className="text-center mb-8 sm:mb-12 px-2">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[hsl(var(--foreground))] mb-3 sm:mb-4">
-              Powerful Healthcare Tools
-            </h2>
-            <p className="text-[hsl(var(--muted-foreground))] text-sm sm:text-base lg:text-lg max-w-xl mx-auto">
-              Three specialized AI models working together for comprehensive healthcare support
-            </p>
-          </AnimatedContainer>
-
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 30, rotate: -2 }}
-                whileInView={{ opacity: 1, y: 0, rotate: 0 }}
-                viewport={{ once: true }}
-                transition={{ 
-                  delay: index * 0.12,
-                  ...springPresets.smooth
-                }}
-              >
-                <Link href={feature.href}>
-                  <TiltCard 
-                    className={`h-full cursor-pointer active:scale-[0.98] ${index === 1 ? 'shape-soft' : index === 2 ? 'shape-asymmetric-alt' : ''}`}
-                  >
-                    <div className="h-full flex flex-col p-4 sm:p-6 md:p-8">
-                      {/* Icon with category color and varied shape */}
-                      <div
-                        className={`w-11 h-11 sm:w-14 sm:h-14 ${index === 0 ? 'rounded-xl' : index === 1 ? 'rounded-2xl' : 'shape-squircle'} ${feature.bgColor} flex items-center justify-center mb-4 sm:mb-6 shadow-lg ${feature.shadowColor}`}
-                      >
-                        <feature.icon className="h-5 w-5 sm:h-7 sm:w-7 text-white" />
+        <div className="grid md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
+          {features.map((feature, i) => (
+            <motion.div
+              key={feature.title}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ delay: i * 0.1, ...springConfigs.smooth }}
+            >
+              <Link href={feature.href}>
+                <ParallaxContainer intensity={8}>
+                  <SpotlightCardV2 borderGlow className="h-full cursor-pointer group">
+                    <div className="p-6 md:p-8">
+                      {/* Icon */}
+                      <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-6 shadow-lg group-hover:scale-105 transition-transform`}>
+                        <feature.icon className="w-7 h-7 md:w-8 md:h-8 text-white" />
                       </div>
-                      
+
+                      {/* Badge */}
+                      <span className="inline-block text-xs font-medium px-2.5 py-1 rounded-full bg-[hsl(var(--muted))] text-[hsl(var(--muted-foreground))] mb-4">
+                        {feature.stats}
+                      </span>
+
                       {/* Content */}
-                      <h3 className="text-lg sm:text-xl font-semibold text-[hsl(var(--foreground))] mb-2 sm:mb-3">
+                      <h3 className="text-xl font-semibold text-[hsl(var(--foreground))] mb-3 group-hover:text-[hsl(var(--brand-primary))] transition-colors">
                         {feature.title}
                       </h3>
-                      <p className="text-sm sm:text-base text-[hsl(var(--muted-foreground))] mb-4 sm:mb-6 flex-grow leading-relaxed">
+                      <p className="text-[hsl(var(--muted-foreground))] mb-6 leading-relaxed">
                         {feature.description}
                       </p>
-                      
-                      {/* CTA with category color */}
-                      <motion.div 
-                        className={`flex items-center gap-2 ${feature.textColor} font-medium text-sm sm:text-base`}
-                        whileHover={{ x: 4 }}
-                        transition={springPresets.snappy}
-                      >
-                        Get Started
-                        <ArrowRight className="h-4 w-4" />
-                      </motion.div>
-                    </div>
-                  </TiltCard>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </section>
 
-        {/* How It Works with varied step colors */}
-        <AnimatedContainer variant="fadeLeft">
-          <Card className="overflow-hidden border-0 shadow-xl shape-asymmetric">
+                      {/* CTA */}
+                      <span className="inline-flex items-center gap-2 text-sm font-medium text-[hsl(var(--brand-primary))] group-hover:gap-3 transition-all">
+                        Get Started
+                        <ArrowRight className="w-4 h-4" />
+                      </span>
+                    </div>
+                  </SpotlightCardV2>
+                </ParallaxContainer>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ============================================
+          HOW IT WORKS SECTION
+          ============================================ */}
+      <section className="py-12 md:py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <GlassCard className="overflow-hidden" variant="strong" hover={false}>
             <div className="grid lg:grid-cols-2 gap-0">
               {/* Steps */}
-              <div className="p-5 sm:p-8 md:p-12 lg:p-16">
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[hsl(var(--foreground))] mb-6 sm:mb-8">
-                  How CuraSense Works
-                </h2>
-                <div className="space-y-5 sm:space-y-8">
-                  {howItWorksSteps.map((item, index) => (
-                    <motion.div 
-                      key={item.step} 
-                      className="flex gap-4 sm:gap-5"
-                      initial={{ opacity: 0, x: -30, scale: 0.95 }}
-                      whileInView={{ opacity: 1, x: 0, scale: 1 }}
-                      transition={{ 
-                        delay: index * 0.15, 
-                        ...springPresets.smooth 
-                      }}
+              <div className="p-6 md:p-10 lg:p-12">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={springConfigs.smooth}
+                >
+                  <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-bold text-[hsl(var(--foreground))] mb-8">
+                    How CuraSense Works
+                  </h2>
+                </motion.div>
+
+                <div className="space-y-6 md:space-y-8">
+                  {howItWorks.map((item, i) => (
+                    <motion.div
+                      key={item.step}
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
+                      transition={{ delay: i * 0.15, ...springConfigs.smooth }}
+                      className="flex gap-4 md:gap-5"
                     >
-                      <div className="flex-shrink-0">
-                        <motion.div 
-                          className={`w-10 h-10 sm:w-12 sm:h-12 ${index === 0 ? 'rounded-lg' : index === 1 ? 'rounded-xl' : 'rounded-2xl'} bg-gradient-to-br ${item.color} flex items-center justify-center text-white font-bold shadow-lg text-sm sm:text-base`}
-                          whileHover={{ scale: 1.1, rotate: 5 }}
-                          transition={springPresets.bouncy}
-                        >
-                          {item.step}
-                        </motion.div>
-                      </div>
+                      <motion.div
+                        className="flex-shrink-0 w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-secondary))] flex items-center justify-center text-white font-bold shadow-lg"
+                        whileHover={{ scale: 1.05, rotate: 3 }}
+                        transition={springConfigs.snappy}
+                      >
+                        {item.step}
+                      </motion.div>
                       <div>
-                        <h3 className="font-semibold text-[hsl(var(--foreground))] text-base sm:text-lg mb-1">
+                        <h3 className="font-semibold text-[hsl(var(--foreground))] text-lg mb-1">
                           {item.title}
                         </h3>
-                        <p className="text-sm sm:text-base text-[hsl(var(--muted-foreground))] leading-relaxed">
-                          {item.desc}
+                        <p className="text-[hsl(var(--muted-foreground))] leading-relaxed">
+                          {item.description}
                         </p>
                       </div>
                     </motion.div>
@@ -455,79 +747,115 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Health CTA Panel - using brand gradient */}
-              <div className="bg-gradient-to-br from-[hsl(var(--brand-primary))] via-[hsl(var(--brand-primary))] to-[hsl(var(--brand-secondary))] p-5 sm:p-8 md:p-12 lg:p-16 flex items-center justify-center relative overflow-hidden">
-                {/* Decorative organic blob */}
-                <div className="absolute inset-0 opacity-10">
-                  <OrganicBlob className="absolute -top-20 -right-20 w-[400px] h-[400px]" color="brand-secondary" />
+              {/* CTA Panel */}
+              <div className="relative bg-gradient-to-br from-[hsl(var(--brand-primary))] via-[hsl(var(--brand-primary))] to-[hsl(var(--brand-secondary))] p-6 md:p-10 lg:p-12 flex items-center justify-center overflow-hidden">
+                {/* Decorative elements */}
+                <div className="absolute inset-0 opacity-20">
+                  <MorphingBlob className="w-[400px] h-[400px] -top-32 -right-32" color="secondary" />
                 </div>
-                
-                <div className="text-center text-white relative z-10">
+
+                <div className="relative z-10 text-center text-white">
                   <motion.div
                     animate={{ 
-                      scale: [1, 1.05, 1],
-                      rotate: [0, 2, -2, 0]
+                      scale: [1, 1.08, 1],
+                      rotate: [0, 3, -3, 0],
                     }}
                     transition={{ 
-                      duration: 2.5, 
+                      duration: 3, 
                       repeat: Infinity, 
-                      ease: "easeInOut" 
+                      ease: "easeInOut",
                     }}
                   >
-                    <Heart className="h-20 w-20 mx-auto mb-6 drop-shadow-lg" />
+                    <Heart className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-6 drop-shadow-lg" />
                   </motion.div>
-                  <h3 className="text-2xl md:text-3xl font-bold mb-4">Your Health Matters</h3>
-                  <p className="text-white/90 max-w-sm mx-auto leading-relaxed">
-                    CuraSense is designed to assist and inform, not replace professional medical advice.
-                    Always consult with healthcare professionals.
+                  
+                  <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                    Your Health Matters
+                  </h3>
+                  <p className="text-white/85 max-w-sm mx-auto leading-relaxed mb-6">
+                    CuraSense assists and informs. Always consult healthcare professionals for medical decisions.
                   </p>
-                  <motion.div 
-                    className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-white/80 shape-pill bg-white/10 px-4 py-2"
-                    whileHover={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
-                  >
-                    <CheckCircle2 className="h-4 w-4" />
-                    Built for Privacy & Security
-                  </motion.div>
+                  
+                  <div className="inline-flex items-center gap-2 text-sm font-medium bg-white/15 backdrop-blur-sm px-4 py-2 rounded-full">
+                    <CheckCircle2 className="w-4 h-4" />
+                    Privacy & Security First
+                  </div>
                 </div>
               </div>
             </div>
-          </Card>
-        </AnimatedContainer>
+          </GlassCard>
+        </div>
+      </section>
 
-        {/* Trust Banner with semantic colors */}
-        <motion.div 
+      {/* ============================================
+          TRUST SECTION
+          ============================================ */}
+      <section className="py-12 md:py-16 px-4">
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="text-center pb-8"
+          className="text-center"
         >
-          <p className="text-sm text-[hsl(var(--muted-foreground))] mb-6 uppercase tracking-wider font-medium">
-            Trusted by healthcare professionals worldwide
+          <p className="text-sm text-[hsl(var(--muted-foreground))] uppercase tracking-wider font-medium mb-8">
+            Trusted by Healthcare Professionals
           </p>
-          <div className="flex flex-wrap justify-center items-center gap-10">
-            {[
-              { Icon: Clock, label: "Fast" },
-              { Icon: Shield, label: "Secure" },
-              { Icon: Brain, label: "Smart" },
-              { Icon: Activity, label: "Accurate" },
-              { Icon: Heart, label: "Caring" },
-            ].map(({ Icon, label }, i) => (
-              <motion.div 
+          
+          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10">
+            {trustFactors.map(({ icon: Icon, label }, i) => (
+              <motion.div
                 key={label}
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.08 }}
+                transition={{ delay: i * 0.1 }}
                 viewport={{ once: true }}
-                whileHover={{ y: -3, scale: 1.1 }}
-                className="flex flex-col items-center gap-2 text-[hsl(var(--muted-foreground)/0.6)] hover:text-[hsl(var(--muted-foreground))] transition-colors cursor-default"
+                whileHover={{ y: -3 }}
+                className="flex flex-col items-center gap-2 text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors cursor-default"
               >
-                <Icon className="h-6 w-6" />
+                <div className="w-10 h-10 rounded-xl bg-[hsl(var(--muted))] flex items-center justify-center">
+                  <Icon className="w-5 h-5" />
+                </div>
                 <span className="text-xs font-medium">{label}</span>
               </motion.div>
             ))}
           </div>
         </motion.div>
-      </div>
+      </section>
+
+      {/* ============================================
+          FINAL CTA
+          ============================================ */}
+      <section className="py-12 md:py-20 px-4 pb-20">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={springConfigs.smooth}
+          className="max-w-3xl mx-auto text-center"
+        >
+          <GlassCard variant="strong" glow glowColor="primary" className="p-8 md:p-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-[hsl(var(--foreground))] mb-4">
+              Ready to Get Started?
+            </h2>
+            <p className="text-[hsl(var(--muted-foreground))] mb-8 max-w-md mx-auto">
+              Join thousands of users who trust CuraSense for intelligent healthcare analysis.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-3">
+              <Link href="/register">
+                <Button size="lg" className="w-full sm:w-auto gap-2 h-12 px-8">
+                  Create Free Account
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+              <Link href="/help">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto h-12 px-8">
+                  Learn More
+                </Button>
+              </Link>
+            </div>
+          </GlassCard>
+        </motion.div>
+      </section>
     </div>
   );
 }
