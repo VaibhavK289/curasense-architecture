@@ -1,8 +1,29 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
-import { Settings, Sun, Moon, Bell, Shield, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Settings,
+  Sun,
+  Moon,
+  Bell,
+  Shield,
+  Trash2,
+  User,
+  Globe,
+  Volume2,
+  VolumeX,
+  Download,
+  ChevronRight,
+  Monitor,
+  Smartphone,
+  Clock,
+  Languages,
+  FileDown,
+  Database,
+  Lock,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -12,15 +33,72 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { GradientText } from "@/components/ui/aceternity";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { useAppStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
+
+interface UserSettings {
+  notifications: boolean;
+  soundEnabled: boolean;
+  language: string;
+  timezone: string;
+  autoDeleteDays: number;
+  dataExportFormat: "json" | "csv" | "pdf";
+}
+
+const DEFAULT_SETTINGS: UserSettings = {
+  notifications: true,
+  soundEnabled: true,
+  language: "en",
+  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  autoDeleteDays: 0,
+  dataExportFormat: "json",
+};
 
 export default function SettingsPage() {
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
-  const { clearReports, clearChatHistory } = useAppStore();
-  const [notifications, setNotifications] = useState(true);
+  const { clearReports, clearChatHistory, reports } = useAppStore();
+  const [isMounted, setIsMounted] = useState(false);
+  const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
+
+  useEffect(() => {
+    setIsMounted(true);
+    const savedSettings = localStorage.getItem("curasense-settings");
+    if (savedSettings) {
+      setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(savedSettings) });
+    }
+  }, []);
+
+  const updateSetting = <K extends keyof UserSettings>(
+    key: K,
+    value: UserSettings[K]
+  ) => {
+    const newSettings = { ...settings, [key]: value };
+    setSettings(newSettings);
+    localStorage.setItem("curasense-settings", JSON.stringify(newSettings));
+    toast.success("Setting updated");
+  };
 
   const handleClearData = () => {
     clearReports();
@@ -28,11 +106,45 @@ export default function SettingsPage() {
     toast.success("All data cleared successfully");
   };
 
+  const handleExportData = () => {
+    const data = {
+      reports: reports,
+      exportedAt: new Date().toISOString(),
+      format: settings.dataExportFormat,
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `curasense-export-${new Date().toISOString().split("T")[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("Data exported successfully");
+  };
+
+  if (!isMounted) {
+    return (
+      <div className="container max-w-4xl mx-auto py-6 px-4">
+        <div className="animate-pulse space-y-6">
+          <div className="h-20 bg-[hsl(var(--muted))] rounded-xl" />
+          <div className="h-48 bg-[hsl(var(--muted))] rounded-xl" />
+          <div className="h-48 bg-[hsl(var(--muted))] rounded-xl" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
+      className="container max-w-4xl mx-auto py-6 px-4"
     >
       {/* Header */}
       <div className="mb-10">
@@ -44,14 +156,25 @@ export default function SettingsPage() {
             <h1 className="text-3xl font-bold">
               <GradientText>Settings</GradientText>
             </h1>
-            <p className="text-slate-600 dark:text-slate-400">
+            <p className="text-[hsl(var(--muted-foreground))]">
               Customize your CuraSense experience
             </p>
           </div>
         </div>
+
+        {/* Quick Link to Profile */}
+        <Button
+          variant="outline"
+          className="gap-2"
+          onClick={() => router.push("/profile")}
+        >
+          <User className="h-4 w-4" />
+          Edit Profile
+          <ChevronRight className="h-4 w-4" />
+        </Button>
       </div>
 
-      <div className="grid gap-6 max-w-2xl">
+      <div className="grid gap-6">
         {/* Appearance */}
         <Card>
           <CardHeader>
@@ -67,12 +190,14 @@ export default function SettingsPage() {
               Customize how CuraSense looks on your device
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Theme</p>
-                <p className="text-sm text-slate-500">
-                  Choose between light and dark mode
+                <p className="font-medium text-[hsl(var(--foreground))]">
+                  Theme
+                </p>
+                <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                  Choose your preferred color mode
                 </p>
               </div>
               <div className="flex gap-2">
@@ -94,44 +219,194 @@ export default function SettingsPage() {
                   <Moon className="h-4 w-4" />
                   Dark
                 </Button>
+                <Button
+                  variant={theme === "system" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setTheme("system")}
+                  className="gap-2"
+                >
+                  <Monitor className="h-4 w-4" />
+                  System
+                </Button>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Notifications */}
+        {/* Notifications & Sound */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bell className="h-5 w-5" />
-              Notifications
+              Notifications & Sound
             </CardTitle>
             <CardDescription>
-              Manage your notification preferences
+              Manage alerts and audio feedback
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Analysis Notifications</p>
-                <p className="text-sm text-slate-500">
+                <p className="font-medium text-[hsl(var(--foreground))]">
+                  Analysis Notifications
+                </p>
+                <p className="text-sm text-[hsl(var(--muted-foreground))]">
                   Get notified when analysis is complete
                 </p>
               </div>
               <Button
-                variant={notifications ? "default" : "outline"}
+                variant={settings.notifications ? "default" : "outline"}
                 size="sm"
-                onClick={() => {
-                  setNotifications(!notifications);
-                  toast.success(
-                    notifications
-                      ? "Notifications disabled"
-                      : "Notifications enabled"
-                  );
-                }}
+                onClick={() =>
+                  updateSetting("notifications", !settings.notifications)
+                }
+                className="gap-2"
               >
-                {notifications ? "Enabled" : "Disabled"}
+                <Bell className="h-4 w-4" />
+                {settings.notifications ? "Enabled" : "Disabled"}
               </Button>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-[hsl(var(--foreground))]">
+                  Sound Effects
+                </p>
+                <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                  Play sounds for notifications and actions
+                </p>
+              </div>
+              <Button
+                variant={settings.soundEnabled ? "default" : "outline"}
+                size="sm"
+                onClick={() =>
+                  updateSetting("soundEnabled", !settings.soundEnabled)
+                }
+                className="gap-2"
+              >
+                {settings.soundEnabled ? (
+                  <Volume2 className="h-4 w-4" />
+                ) : (
+                  <VolumeX className="h-4 w-4" />
+                )}
+                {settings.soundEnabled ? "On" : "Off"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Language & Region */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Globe className="h-5 w-5" />
+              Language & Region
+            </CardTitle>
+            <CardDescription>
+              Set your preferred language and timezone
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-[hsl(var(--foreground))]">
+                  Language
+                </p>
+                <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                  Select your preferred language
+                </p>
+              </div>
+              <Select
+                value={settings.language}
+                onValueChange={(value) => updateSetting("language", value)}
+              >
+                <SelectTrigger className="w-40">
+                  <Languages className="h-4 w-4 mr-2" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="es">Español</SelectItem>
+                  <SelectItem value="fr">Français</SelectItem>
+                  <SelectItem value="de">Deutsch</SelectItem>
+                  <SelectItem value="zh">中文</SelectItem>
+                  <SelectItem value="ja">日本語</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-[hsl(var(--foreground))]">
+                  Timezone
+                </p>
+                <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                  Used for report timestamps
+                </p>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-[hsl(var(--muted-foreground))]">
+                <Clock className="h-4 w-4" />
+                {settings.timezone}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Data & Privacy */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Database className="h-5 w-5" />
+              Data & Privacy
+            </CardTitle>
+            <CardDescription>
+              Export your data and manage storage
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-[hsl(var(--foreground))]">
+                  Export Data
+                </p>
+                <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                  Download all your reports and data
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportData}
+                className="gap-2"
+              >
+                <FileDown className="h-4 w-4" />
+                Export ({reports.length} reports)
+              </Button>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-[hsl(var(--foreground))]">
+                  Auto-Delete Old Reports
+                </p>
+                <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                  Automatically remove reports after a period
+                </p>
+              </div>
+              <Select
+                value={settings.autoDeleteDays.toString()}
+                onValueChange={(value) =>
+                  updateSetting("autoDeleteDays", parseInt(value))
+                }
+              >
+                <SelectTrigger className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">Never</SelectItem>
+                  <SelectItem value="7">7 days</SelectItem>
+                  <SelectItem value="30">30 days</SelectItem>
+                  <SelectItem value="90">90 days</SelectItem>
+                  <SelectItem value="365">1 year</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>
@@ -144,63 +419,106 @@ export default function SettingsPage() {
               API Configuration
             </CardTitle>
             <CardDescription>
-              Configure API endpoints (for development)
+              Backend server information (read-only)
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Backend API URL</label>
-              <Input
-                defaultValue="http://localhost:8000"
-                className="mt-1"
-                disabled
-              />
+              <label className="text-sm font-medium text-[hsl(var(--foreground))]">
+                Backend API URL
+              </label>
+              <div className="flex items-center gap-2 mt-1">
+                <Lock className="h-4 w-4 text-[hsl(var(--muted-foreground))]" />
+                <Input
+                  defaultValue="http://localhost:8000"
+                  className="flex-1"
+                  disabled
+                />
+              </div>
             </div>
             <div>
-              <label className="text-sm font-medium">ML Server URL</label>
-              <Input
-                defaultValue="http://localhost:8001"
-                className="mt-1"
-                disabled
-              />
+              <label className="text-sm font-medium text-[hsl(var(--foreground))]">
+                Vision Server URL
+              </label>
+              <div className="flex items-center gap-2 mt-1">
+                <Lock className="h-4 w-4 text-[hsl(var(--muted-foreground))]" />
+                <Input
+                  defaultValue="http://localhost:8001"
+                  className="flex-1"
+                  disabled
+                />
+              </div>
             </div>
-            <p className="text-xs text-slate-500">
-              API endpoints are configured automatically. Contact support to
-              change these settings.
+            <p className="text-xs text-[hsl(var(--muted-foreground))]">
+              API endpoints are configured automatically via environment
+              variables.
             </p>
           </CardContent>
         </Card>
 
-        {/* Data Management */}
-        <Card className="border-red-200 dark:border-red-900">
+        {/* Danger Zone */}
+        <Card className="border-[hsl(var(--color-error)/0.3)]">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-600">
+            <CardTitle className="flex items-center gap-2 text-[hsl(var(--color-error))]">
               <Trash2 className="h-5 w-5" />
-              Data Management
+              Danger Zone
             </CardTitle>
             <CardDescription>
-              Manage your stored data and session history
+              Irreversible actions for data management
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between p-4 rounded-lg bg-[hsl(var(--color-error)/0.05)] border border-[hsl(var(--color-error)/0.2)]">
               <div>
-                <p className="font-medium">Clear All Data</p>
-                <p className="text-sm text-slate-500">
-                  Remove all reports and chat history from this session
+                <p className="font-medium text-[hsl(var(--foreground))]">
+                  Clear All Data
+                </p>
+                <p className="text-sm text-[hsl(var(--muted-foreground))]">
+                  Remove all reports, chat history, and cached data
                 </p>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-red-600 border-red-200 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-950"
-                onClick={handleClearData}
-              >
-                Clear Data
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-[hsl(var(--color-error))] border-[hsl(var(--color-error)/0.3)] hover:bg-[hsl(var(--color-error)/0.1)]"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Clear Data
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Clear All Data</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      all your reports, chat history, and cached data from this
+                      device.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleClearData}
+                      className="bg-[hsl(var(--color-error))] hover:bg-[hsl(var(--color-error))]/90"
+                    >
+                      Yes, Clear Everything
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </CardContent>
         </Card>
+
+        {/* Version Info */}
+        <div className="text-center text-sm text-[hsl(var(--muted-foreground))] py-4">
+          <p>CuraSense v1.0.0 • AI Healthcare Platform</p>
+          <p className="text-xs mt-1">
+            © 2026 CuraSense. All rights reserved.
+          </p>
+        </div>
       </div>
     </motion.div>
   );

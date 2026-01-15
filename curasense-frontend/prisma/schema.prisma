@@ -264,3 +264,25 @@ model AnalyticsDaily {
   @@map("analytics_daily")
 }
 
+// ============================================
+// PASSWORD RESET TOKEN TABLE
+// For forgot password functionality
+// ============================================
+
+model PasswordResetToken {
+  id          String    @id @default(cuid())
+  
+  email       String
+  token       String    @unique
+  expiresAt   DateTime  @map("expires_at")
+  usedAt      DateTime? @map("used_at")
+  
+  createdAt   DateTime  @default(now()) @map("created_at")
+  
+  @@index([email])
+  @@index([token])
+  @@index([expiresAt])
+  
+  @@map("password_reset_tokens")
+}
+

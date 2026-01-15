@@ -226,7 +226,7 @@ export default function Home() {
 
   // Authenticated users see a dashboard, not the marketing landing page
   if (isAuthenticated) {
-    return <AuthenticatedDashboard userName={user?.name} />;
+    return <AuthenticatedDashboard userName={user?.displayName || user?.firstName} />;
   }
 
   return (

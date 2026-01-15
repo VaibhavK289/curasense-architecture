@@ -17,6 +17,7 @@ import {
   ChevronRight,
   History,
   BarChart3,
+  User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GradientText } from "@/components/ui/aceternity";
@@ -68,6 +69,14 @@ const navigation = [
     activeColor: "text-[hsl(var(--brand-secondary))]",
     activeBg: "bg-[hsl(var(--brand-secondary)/0.1)]",
   },
+  {
+    name: "My Profile",
+    href: "/profile",
+    icon: User,
+    color: "text-[hsl(var(--brand-primary))]",
+    activeColor: "text-[hsl(var(--brand-primary))]",
+    activeBg: "bg-[hsl(var(--brand-primary)/0.1)]",
+  },
 ];
 
 const bottomNav = [
@@ -80,7 +89,7 @@ const tabBarItems = [
   { name: "Home", href: "/", icon: Home },
   { name: "Diagnosis", href: "/diagnosis", icon: Stethoscope },
   { name: "Medicine", href: "/medicine", icon: Pill },
-  { name: "History", href: "/history", icon: History },
+  { name: "Profile", href: "/profile", icon: User },
 ];
 
 export function MobileNav() {

@@ -294,3 +294,127 @@ export async function updateUserProfile(
     },
   });
 }
+
+// ============================================
+// PASSWORD RESET OPERATIONS
+// ============================================
+
+const RESET_TOKEN_EXPIRES_IN = 60 * 60 * 1000; // 1 hour in ms
+
+export async function createPasswordResetToken(email: string): Promise<{ token: string; user: User } | null> {
+  const user = await prisma.user.findUnique({
+    where: { email: email.toLowerCase() },
+  });
+
+  if (!user) {
+    // Don't reveal if email exists or not
+    return null;
+  }
+
+  // Delete any existing tokens for this email
+  await prisma.passwordResetToken.deleteMany({
+    where: { email: email.toLowerCase() },
+  });
+
+  // Generate a secure token
+  const token = crypto.randomUUID() + crypto.randomUUID();
+
+  await prisma.passwordResetToken.create({
+    data: {
+      email: email.toLowerCase(),
+      token,
+      expiresAt: new Date(Date.now() + RESET_TOKEN_EXPIRES_IN),
+    },
+  });
+
+  return { token, user };
+}
+
+export async function verifyPasswordResetToken(token: string): Promise<string | null> {
+  const resetToken = await prisma.passwordResetToken.findUnique({
+    where: { token },
+  });
+
+  if (!resetToken) {
+    return null;
+  }
+
+  if (resetToken.expiresAt < new Date()) {
+    // Token expired, delete it
+    await prisma.passwordResetToken.delete({
+      where: { id: resetToken.id },
+    });
+    return null;
+  }
+
+  if (resetToken.usedAt) {
+    // Token already used
+    return null;
+  }
+
+  return resetToken.email;
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<boolean> {
+  const email = await verifyPasswordResetToken(token);
+  
+  if (!email) {
+    return false;
+  }
+
+  const passwordHash = await hashPassword(newPassword);
+
+  // Update user password
+  await prisma.user.update({
+    where: { email },
+    data: { 
+      passwordHash,
+      failedLoginCount: 0,
+      lockedUntil: null,
+    },
+  });
+
+  // Mark token as used
+  await prisma.passwordResetToken.update({
+    where: { token },
+    data: { usedAt: new Date() },
+  });
+
+  // Invalidate all existing sessions for security
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (user) {
+    await prisma.session.deleteMany({
+      where: { userId: user.id },
+    });
+  }
+
+  return true;
+}
+
+export async function changePassword(
+  userId: string, 
+  currentPassword: string, 
+  newPassword: string
+): Promise<boolean> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    return false;
+  }
+
+  const isValid = await verifyPassword(currentPassword, user.passwordHash);
+  if (!isValid) {
+    return false;
+  }
+
+  const passwordHash = await hashPassword(newPassword);
+  
+  await prisma.user.update({
+    where: { id: userId },
+    data: { passwordHash },
+  });
+
+  return true;
+}

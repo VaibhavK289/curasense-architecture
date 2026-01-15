@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Mail, Lock, LogIn } from "lucide-react";
+import { ArrowLeft, Mail, Lock, LogIn, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +18,7 @@ export default function LoginPage() {
   const { login, isLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,8 +33,12 @@ export default function LoginPage() {
     try {
       await login(email, password);
       router.push("/");
-    } catch {
-      setError("Login failed. Please try again.");
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Login failed. Please check your credentials and try again.");
+      }
     }
   };
 
@@ -113,23 +118,34 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <button 
-                  type="button"
+                <Link 
+                  href="/forgot-password"
                   className="text-xs text-[hsl(var(--brand-primary))] hover:underline"
                 >
                   Forgot password?
-                </button>
+                </Link>
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[hsl(var(--muted-foreground))]" />
                 <Input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 pr-10"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
               </div>
             </div>
 
@@ -152,22 +168,17 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-
-          {/* Demo Notice */}
-          <div className="mt-6 pt-6 border-t border-[hsl(var(--border))]">
-            <p className="text-xs text-center text-[hsl(var(--muted-foreground))]">
-              <strong>Portfolio Demo:</strong> Enter any email and password to sign in.
-              This is a demonstration of the authentication flow.
-            </p>
-          </div>
         </Card>
 
         {/* Sign up link */}
         <p className="text-center text-sm text-[hsl(var(--muted-foreground))] mt-6">
           Don&apos;t have an account?{" "}
-          <button className="text-[hsl(var(--brand-primary))] hover:underline font-medium">
-            Request access
-          </button>
+          <Link 
+            href="/register" 
+            className="text-[hsl(var(--brand-primary))] hover:underline font-medium"
+          >
+            Create an account
+          </Link>
         </p>
       </motion.div>
     </div>

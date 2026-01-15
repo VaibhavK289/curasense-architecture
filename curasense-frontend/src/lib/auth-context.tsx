@@ -1,100 +1,335 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 
-interface User {
+// ============================================
+// TYPES
+// ============================================
+
+export interface User {
   id: string;
-  name: string;
   email: string;
-  role: "doctor" | "patient" | "admin";
-  avatar?: string;
+  firstName: string;
+  lastName: string;
+  displayName: string | null;
+  role: "PATIENT" | "DOCTOR" | "ADMIN";
+  avatarUrl: string | null;
+  status: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  // For demo purposes - toggle auth state
-  toggleAuth: () => void;
+  accessToken: string | null;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  register: (data: RegisterData) => Promise<{ success: boolean; error?: string }>;
+  logout: () => Promise<void>;
+  forgotPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
+  resetPassword: (token: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  refreshToken: () => Promise<boolean>;
 }
+
+interface RegisterData {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  dateOfBirth?: string;
+}
+
+interface AuthState {
+  user: User | null;
+  accessToken: string | null;
+  expiresAt: number | null;
+}
+
+// ============================================
+// CONSTANTS
+// ============================================
+
+const AUTH_STORAGE_KEY = "curasense_auth";
+const TOKEN_REFRESH_THRESHOLD = 5 * 60 * 1000; // 5 minutes before expiry
+
+// ============================================
+// CONTEXT
+// ============================================
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// ============================================
+// PROVIDER
+// ============================================
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [authState, setAuthState] = useState<AuthState>({
+    user: null,
+    accessToken: null,
+    expiresAt: null,
+  });
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check for existing session on mount
-  useEffect(() => {
-    const checkAuth = () => {
-      // In production, this would check a real session/token
-      const savedAuth = localStorage.getItem("curasense_auth");
-      if (savedAuth) {
-        try {
-          const parsed = JSON.parse(savedAuth);
-          setUser(parsed);
-        } catch {
-          localStorage.removeItem("curasense_auth");
-        }
+  // Persist auth state to localStorage
+  const persistAuth = useCallback((state: AuthState) => {
+    if (typeof window !== "undefined") {
+      if (state.user && state.accessToken) {
+        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(state));
+      } else {
+        localStorage.removeItem(AUTH_STORAGE_KEY);
       }
-      setIsLoading(false);
-    };
-    
-    checkAuth();
+    }
   }, []);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const login = async (email: string, _password: string) => {
-    // In production, this would call your auth API with password
-    setIsLoading(true);
-    
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    
-    const newUser: User = {
-      id: "1",
-      name: email.split("@")[0],
-      email,
-      role: "doctor",
-    };
-    
-    setUser(newUser);
-    localStorage.setItem("curasense_auth", JSON.stringify(newUser));
-    setIsLoading(false);
-  };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("curasense_auth");
-  };
-
-  // For demo/portfolio - toggle between states
-  const toggleAuth = () => {
-    if (user) {
-      logout();
-    } else {
-      const demoUser: User = {
-        id: "demo",
-        name: "Demo User",
-        email: "demo@curasense.ai",
-        role: "doctor",
-      };
-      setUser(demoUser);
-      localStorage.setItem("curasense_auth", JSON.stringify(demoUser));
+  // Clear auth state
+  const clearAuth = useCallback(() => {
+    setAuthState({ user: null, accessToken: null, expiresAt: null });
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(AUTH_STORAGE_KEY);
     }
-  };
+  }, []);
+
+  // Refresh access token
+  const refreshToken = useCallback(async (): Promise<boolean> => {
+    try {
+      const response = await fetch("/api/auth/refresh", {
+        method: "POST",
+        credentials: "include", // Include cookies
+      });
+
+      if (!response.ok) {
+        clearAuth();
+        return false;
+      }
+
+      const data = await response.json();
+      const expiresAt = Date.now() + data.expiresIn * 1000;
+
+      setAuthState((prev) => ({
+        ...prev,
+        accessToken: data.accessToken,
+        expiresAt,
+      }));
+
+      return true;
+    } catch {
+      clearAuth();
+      return false;
+    }
+  }, [clearAuth]);
+
+  // Verify and restore session on mount
+  useEffect(() => {
+    const initAuth = async () => {
+      if (typeof window === "undefined") {
+        setIsLoading(false);
+        return;
+      }
+
+      const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+      if (!stored) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const parsed: AuthState = JSON.parse(stored);
+        
+        // Check if token is expired
+        if (parsed.expiresAt && parsed.expiresAt < Date.now()) {
+          // Try to refresh
+          const refreshed = await refreshToken();
+          if (!refreshed) {
+            clearAuth();
+          }
+        } else if (parsed.accessToken) {
+          // Verify token with server
+          const response = await fetch("/api/auth/verify", {
+            headers: {
+              Authorization: `Bearer ${parsed.accessToken}`,
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setAuthState({
+              user: data.user,
+              accessToken: parsed.accessToken,
+              expiresAt: parsed.expiresAt,
+            });
+          } else {
+            // Try refresh
+            const refreshed = await refreshToken();
+            if (!refreshed) {
+              clearAuth();
+            }
+          }
+        }
+      } catch {
+        clearAuth();
+      }
+
+      setIsLoading(false);
+    };
+
+    initAuth();
+  }, [clearAuth, refreshToken]);
+
+  // Auto-refresh token before expiry
+  useEffect(() => {
+    if (!authState.expiresAt || !authState.accessToken) return;
+
+    const timeUntilExpiry = authState.expiresAt - Date.now();
+    const refreshTime = timeUntilExpiry - TOKEN_REFRESH_THRESHOLD;
+
+    if (refreshTime <= 0) {
+      refreshToken();
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      refreshToken();
+    }, refreshTime);
+
+    return () => clearTimeout(timeout);
+  }, [authState.expiresAt, authState.accessToken, refreshToken]);
+
+  // Login
+  const login = useCallback(async (
+    email: string,
+    password: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: data.error || "Login failed" };
+      }
+
+      const expiresAt = Date.now() + data.expiresIn * 1000;
+      const newState: AuthState = {
+        user: data.user,
+        accessToken: data.accessToken,
+        expiresAt,
+      };
+
+      setAuthState(newState);
+      persistAuth(newState);
+
+      return { success: true };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Login failed";
+      return { success: false, error: message };
+    }
+  }, [persistAuth]);
+
+  // Register
+  const register = useCallback(async (
+    data: RegisterData
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: result.error || "Registration failed" };
+      }
+
+      return { success: true };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Registration failed";
+      return { success: false, error: message };
+    }
+  }, []);
+
+  // Logout
+  const logout = useCallback(async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch {
+      // Ignore logout errors
+    } finally {
+      clearAuth();
+    }
+  }, [clearAuth]);
+
+  // Forgot Password
+  const forgotPassword = useCallback(async (
+    email: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: data.error || "Failed to send reset email" };
+      }
+
+      return { success: true };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Request failed";
+      return { success: false, error: message };
+    }
+  }, []);
+
+  // Reset Password
+  const resetPassword = useCallback(async (
+    token: string,
+    password: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: data.error || "Failed to reset password" };
+      }
+
+      return { success: true };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Request failed";
+      return { success: false, error: message };
+    }
+  }, []);
 
   return (
     <AuthContext.Provider
       value={{
-        user,
-        isAuthenticated: !!user,
+        user: authState.user,
+        isAuthenticated: !!authState.user,
         isLoading,
+        accessToken: authState.accessToken,
         login,
+        register,
         logout,
-        toggleAuth,
+        forgotPassword,
+        resetPassword,
+        refreshToken,
       }}
     >
       {children}
@@ -102,10 +337,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// ============================================
+// HOOK
+// ============================================
+
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
+}
+
+// ============================================
+// UTILITY: Authenticated Fetch
+// ============================================
+
+export function useAuthenticatedFetch() {
+  const { accessToken, refreshToken, logout } = useAuth();
+
+  return useCallback(
+    async (url: string, options: RequestInit = {}): Promise<Response> => {
+      const headers = new Headers(options.headers);
+      
+      if (accessToken) {
+        headers.set("Authorization", `Bearer ${accessToken}`);
+      }
+
+      let response = await fetch(url, { ...options, headers });
+
+      // If unauthorized, try to refresh and retry
+      if (response.status === 401 && accessToken) {
+        const refreshed = await refreshToken();
+        if (refreshed) {
+          headers.set("Authorization", `Bearer ${accessToken}`);
+          response = await fetch(url, { ...options, headers });
+        } else {
+          await logout();
+        }
+      }
+
+      return response;
+    },
+    [accessToken, refreshToken, logout]
+  );
 }

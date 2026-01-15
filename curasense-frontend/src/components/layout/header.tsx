@@ -29,7 +29,7 @@ const notifications = [
 
 export function Header() {
   const { theme, setTheme } = useTheme();
-  const { user, isAuthenticated, logout, toggleAuth } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -210,7 +210,7 @@ export function Header() {
                   <User className="h-4 w-4" />
                 </div>
                 <span className="hidden sm:block text-sm font-medium text-[hsl(var(--foreground))]">
-                  {user?.name || "User"}
+                  {user?.displayName || user?.firstName || "User"}
                 </span>
                 <ChevronDown className={cn(
                   "hidden sm:block h-4 w-4 text-[hsl(var(--muted-foreground))] transition-transform",
@@ -228,7 +228,7 @@ export function Header() {
                     className="absolute right-0 top-full mt-2 w-52 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-lg overflow-hidden"
                   >
                     <div className="p-3 border-b border-[hsl(var(--border))]">
-                      <p className="text-sm font-medium text-[hsl(var(--foreground))]">{user?.name}</p>
+                      <p className="text-sm font-medium text-[hsl(var(--foreground))]">{user?.displayName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'User'}</p>
                       <p className="text-xs text-[hsl(var(--muted-foreground))]">{user?.email}</p>
                     </div>
                     <div className="p-1.5">
@@ -265,27 +265,17 @@ export function Header() {
                 Login
               </Button>
             </Link>
-            <Button 
-              onClick={toggleAuth} // For demo - in production this would be a real auth flow
-              size="sm" 
-              className="gap-2 text-sm font-medium h-9 px-4 rounded-lg bg-[hsl(var(--brand-primary))] hover:bg-[hsl(var(--brand-primary)/0.9)]"
-            >
-              <span className="hidden sm:inline">Get Started</span>
-              <span className="sm:hidden">Start</span>
-              <ArrowRight className="h-4 w-4" />
-            </Button>
+            <Link href="/register">
+              <Button 
+                size="sm" 
+                className="gap-2 text-sm font-medium h-9 px-4 rounded-lg bg-[hsl(var(--brand-primary))] hover:bg-[hsl(var(--brand-primary)/0.9)]"
+              >
+                <span className="hidden sm:inline">Get Started</span>
+                <span className="sm:hidden">Start</span>
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
           </>
-        )}
-
-        {/* Demo Toggle - for portfolio demonstration */}
-        {process.env.NODE_ENV === "development" && (
-          <button
-            onClick={toggleAuth}
-            className="hidden lg:flex h-8 items-center px-2 rounded text-[10px] font-mono text-[hsl(var(--muted-foreground))] bg-[hsl(var(--muted))] hover:text-[hsl(var(--foreground))]"
-            title="Toggle auth state (dev only)"
-          >
-            {isAuthenticated ? "→ Logout" : "→ Login"}
-          </button>
         )}
       </div>
     </motion.header>
