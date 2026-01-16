@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY requirements.txt .
 # Increase timeout and use no-cache to ensure a clean install
-RUN pip install --no-cache-dir --timeout=1000 -r requirements.txt
+RUN pip install --no-cache-dir --timeout=2000 -r requirements.txt
 
 COPY . .
 

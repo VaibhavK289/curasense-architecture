@@ -23,25 +23,18 @@ RUN --mount=type=cache,target=/root/.npm \
     npm ci --prefer-offline --no-audit --no-fund
 
 # ============================================
-# PRISMA STAGE - Generate Prisma client separately
-# Only rebuilds when schema changes
-# ============================================
-FROM base AS prisma
-COPY --from=deps /app/node_modules ./node_modules
-COPY prisma ./prisma
-RUN npx prisma generate
-
-# ============================================
 # BUILDER STAGE - Build the Next.js app
 # ============================================
 FROM base AS builder
 
-# Copy cached node_modules and generated prisma
+# Copy node_modules
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=prisma /app/node_modules/.prisma ./node_modules/.prisma
 
 # Copy source files (excluded by .dockerignore)
 COPY . .
+
+# Generate Prisma client (outputs to src/generated/prisma)
+RUN npx prisma generate
 
 # Build with production optimizations
 ENV NODE_ENV=production
