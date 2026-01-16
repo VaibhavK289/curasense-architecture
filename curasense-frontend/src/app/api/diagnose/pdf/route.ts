@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 const BACKEND_URL = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_FRONTEND_API || "http://localhost:8000";
 
 // Increase timeout to 5 minutes for ML model loading
-export const maxDuration = 300;
+export const maxDuration = 500;
 
 export async function POST(request: NextRequest) {
   try {

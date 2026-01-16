@@ -29,6 +29,8 @@ interface AuthContextType {
   forgotPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
   resetPassword: (token: string, password: string) => Promise<{ success: boolean; error?: string }>;
   refreshToken: () => Promise<boolean>;
+  refreshUser: () => Promise<void>;
+  updateProfile: (data: Partial<User>) => Promise<{ success: boolean; error?: string }>;
   continueAsGuest: () => void;
   exitGuestMode: () => void;
 }
@@ -347,6 +349,88 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Refresh user data from server
+  const refreshUser = useCallback(async () => {
+    if (!authState.accessToken) return;
+
+    try {
+      const response = await fetch("/api/auth/verify", {
+        headers: {
+          Authorization: `Bearer ${authState.accessToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAuthState((prev) => ({
+          ...prev,
+          user: data.user,
+        }));
+        
+        // Also update localStorage
+        if (typeof window !== "undefined") {
+          const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            parsed.user = data.user;
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(parsed));
+          }
+        }
+      }
+    } catch {
+      // Ignore refresh errors
+    }
+  }, [authState.accessToken]);
+
+  // Update user profile
+  const updateProfile = useCallback(async (
+    data: Partial<User>
+  ): Promise<{ success: boolean; error?: string }> => {
+    if (!authState.accessToken) {
+      return { success: false, error: "Not authenticated" };
+    }
+
+    try {
+      const response = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authState.accessToken}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        return { success: false, error: result.error || "Failed to update profile" };
+      }
+
+      // Update local state with new user data
+      if (result.user) {
+        setAuthState((prev) => ({
+          ...prev,
+          user: prev.user ? { ...prev.user, ...result.user } : null,
+        }));
+        
+        // Also update localStorage
+        if (typeof window !== "undefined") {
+          const stored = localStorage.getItem(AUTH_STORAGE_KEY);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            parsed.user = { ...parsed.user, ...result.user };
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(parsed));
+          }
+        }
+      }
+
+      return { success: true };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to update profile";
+      return { success: false, error: message };
+    }
+  }, [authState.accessToken]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -361,6 +445,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         forgotPassword,
         resetPassword,
         refreshToken,
+        refreshUser,
+        updateProfile,
         continueAsGuest,
         exitGuestMode,
       }}

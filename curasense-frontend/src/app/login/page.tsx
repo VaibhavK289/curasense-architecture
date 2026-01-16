@@ -30,15 +30,16 @@ export default function LoginPage() {
       return;
     }
 
-    try {
-      await login(email, password);
+    const result = await login(email, password);
+    
+    if (result.success) {
+      // Force a refresh to update server components and auth state
+      router.refresh();
+      // Small delay to ensure auth state is propagated before navigation
+      await new Promise(resolve => setTimeout(resolve, 100));
       router.push("/");
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Login failed. Please check your credentials and try again.");
-      }
+    } else {
+      setError(result.error || "Login failed. Please check your credentials and try again.");
     }
   };
 

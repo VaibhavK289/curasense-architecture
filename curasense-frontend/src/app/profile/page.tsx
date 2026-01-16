@@ -30,6 +30,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
+import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -480,30 +481,8 @@ function RecentUploads() {
 // USER PROFILE SECTION
 // ============================================
 
-function getInitialProfile(): UserProfile {
-  if (typeof window === "undefined") {
-    return {
-      firstName: "Demo",
-      lastName: "User",
-      email: "demo@curasense.com",
-      dateOfBirth: "1990-01-15",
-      gender: "prefer-not-to-say",
-      bloodType: "",
-      phone: "",
-      avatarUrl: "",
-    };
-  }
-  
-  const savedProfile = localStorage.getItem("curasense-profile");
-  if (savedProfile) {
-    try {
-      return JSON.parse(savedProfile);
-    } catch {
-      // Ignore parse errors
-    }
-  }
-  
-  return {
+function getInitialProfile(authUser?: { firstName: string; lastName: string; email: string; avatarUrl?: string | null } | null): UserProfile {
+  const defaultProfile: UserProfile = {
     firstName: "Demo",
     lastName: "User",
     email: "demo@curasense.com",
@@ -513,13 +492,67 @@ function getInitialProfile(): UserProfile {
     phone: "",
     avatarUrl: "",
   };
+
+  if (typeof window === "undefined") {
+    return authUser ? {
+      ...defaultProfile,
+      firstName: authUser.firstName,
+      lastName: authUser.lastName,
+      email: authUser.email,
+      avatarUrl: authUser.avatarUrl || "",
+    } : defaultProfile;
+  }
+  
+  const savedProfile = localStorage.getItem("curasense-profile");
+  if (savedProfile) {
+    try {
+      const parsed = JSON.parse(savedProfile);
+      // If we have an authenticated user, merge their data with saved profile
+      if (authUser) {
+        return {
+          ...parsed,
+          firstName: authUser.firstName,
+          lastName: authUser.lastName,
+          email: authUser.email,
+          avatarUrl: authUser.avatarUrl || parsed.avatarUrl || "",
+        };
+      }
+      return parsed;
+    } catch {
+      // Ignore parse errors
+    }
+  }
+  
+  // Return profile with auth user data if available
+  if (authUser) {
+    return {
+      ...defaultProfile,
+      firstName: authUser.firstName,
+      lastName: authUser.lastName,
+      email: authUser.email,
+      avatarUrl: authUser.avatarUrl || "",
+    };
+  }
+  
+  return defaultProfile;
 }
 
 function ProfileSection() {
+  const { user, isAuthenticated, updateProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
-  const [profile, setProfile] = useState<UserProfile>(getInitialProfile);
-  const [editedProfile, setEditedProfile] = useState<UserProfile>(getInitialProfile);
+  const [profile, setProfile] = useState<UserProfile>(() => getInitialProfile(user));
+  const [editedProfile, setEditedProfile] = useState<UserProfile>(() => getInitialProfile(user));
+
+  // Sync profile with auth user when user changes (login/logout)
+  useEffect(() => {
+    if (user && isAuthenticated) {
+      const updatedProfile = getInitialProfile(user);
+      setProfile(updatedProfile);
+      setEditedProfile(updatedProfile);
+    }
+  }, [user, isAuthenticated]);
 
   useEffect(() => {
     // Mark as mounted after first render
@@ -527,10 +560,30 @@ function ProfileSection() {
     return () => cancelAnimationFrame(timer);
   }, []);
 
-  const handleSave = () => {
-    setProfile(editedProfile);
+  const handleSave = async () => {
+    setIsSaving(true);
+    
+    // Save to localStorage for guest mode or additional fields
     localStorage.setItem("curasense-profile", JSON.stringify(editedProfile));
+    
+    // If authenticated, also update the server
+    if (isAuthenticated) {
+      const result = await updateProfile({
+        firstName: editedProfile.firstName,
+        lastName: editedProfile.lastName,
+        displayName: `${editedProfile.firstName} ${editedProfile.lastName}`,
+      });
+      
+      if (!result.success) {
+        toast.error(result.error || "Failed to update profile on server");
+        setIsSaving(false);
+        return;
+      }
+    }
+    
+    setProfile(editedProfile);
     setIsEditing(false);
+    setIsSaving(false);
     toast.success("Profile updated successfully");
   };
 
@@ -606,13 +659,23 @@ function ProfileSection() {
                 size="sm"
                 onClick={handleCancel}
                 className="gap-2"
+                disabled={isSaving}
               >
                 <X className="h-4 w-4" />
                 Cancel
               </Button>
-              <Button size="sm" onClick={handleSave} className="gap-2">
-                <Save className="h-4 w-4" />
-                Save
+              <Button size="sm" onClick={handleSave} className="gap-2" disabled={isSaving}>
+                {isSaving ? (
+                  <>
+                    <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4" />
+                    Save
+                  </>
+                )}
               </Button>
             </div>
           )}
