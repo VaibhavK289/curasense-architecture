@@ -3,17 +3,17 @@ import { NextRequest, NextResponse } from "next/server";
 // Backend URL - server-side only (not NEXT_PUBLIC_)
 const BACKEND_URL = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_FRONTEND_API || "http://localhost:8000";
 
-// Increase timeout to 5 minutes for ML model loading
-export const maxDuration = 300;
+// Max duration for Vercel hobby plan (60s max)
+export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   try {
     // Get the JSON body from the request
     const body = await request.json();
     
-    // Create AbortController with 5 minute timeout
+    // Create AbortController with 60 second timeout (matches Vercel limit)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 seconds
     
     // Forward the request to the backend with extended timeout
     const response = await fetch(`${BACKEND_URL}/diagnose/text/`, {
