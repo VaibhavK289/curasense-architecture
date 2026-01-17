@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Enable standalone output for Docker
-  output: "standalone",
+  // Vercel-optimized settings (remove standalone for serverless)
+  // output: "standalone" is only for Docker deployments
   
   // Experimental features
   experimental: {
@@ -21,6 +21,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  
+  // Vercel serverless function configuration
+  // Maximize performance under free tier
+  serverExternalPackages: ["@prisma/client", "prisma"],
 };
 
 export default nextConfig;
