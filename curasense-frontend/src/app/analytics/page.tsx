@@ -7,7 +7,7 @@ import { AnalyticsDashboard } from "@/components/analytics";
 import { Button } from "@/components/ui/button";
 import { useDemoDataGenerator } from "@/lib/use-analytics-tracking";
 import { useAppStore } from "@/lib/store";
-import { springPresets } from "@/styles/tokens/animations";
+import { springPresets } from "@/styles/tokens";
 import { toast } from "sonner";
 
 export default function AnalyticsPage() {

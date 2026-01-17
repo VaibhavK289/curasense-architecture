@@ -58,7 +58,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { springPresets } from "@/styles/tokens/animations";
+import { springPresets } from "@/styles/tokens";
 
 // ============================================
 // TYPES

@@ -1,0 +1,19 @@
+# ============================================
+# BASE ML DEPENDENCIES - RARELY CHANGES
+# These are the heaviest packages, cached first
+# Total: ~2.5GB download
+# ============================================
+
+# PyTorch ecosystem (pinned for reproducibility)
+torch==2.1.2
+torchvision==0.16.2
+torchaudio==2.1.2
+
+# Tokenizers - install FIRST to ensure version
+tokenizers>=0.22.0
+
+# Transformers (for BERT and custom models)
+transformers>=4.48.0
+
+# Sentence Transformers (for embeddings)
+sentence-transformers>=3.0.0

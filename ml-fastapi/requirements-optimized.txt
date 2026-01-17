@@ -1,0 +1,49 @@
+# ============================================
+# CURASENSE VISION API - SPLIT REQUIREMENTS
+# For optimal Docker layer caching
+# ============================================
+
+# ============================================
+# HEAVY DEPENDENCIES (install first)
+# ============================================
+# LangChain ecosystem
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain_community>=0.0.10
+langgraph>=0.0.20
+langchain-text-splitters>=0.0.1
+
+# Vector database
+chromadb>=0.4.22
+
+# Google AI
+google-generativeai>=0.3.2
+google-genai>=0.1.0
+langchain-google-genai>=0.0.5
+
+# ============================================
+# APPLICATION DEPENDENCIES
+# ============================================
+# FastAPI framework
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.5.0
+
+# PDF processing
+pypdf>=3.17.0
+
+# Image processing
+pillow>=10.2.0
+
+# Scheduling
+APScheduler>=3.10.4
+
+# Utilities
+python-multipart>=0.0.6
+python-dotenv>=1.0.0
+
+# Groq for inference
+langchain-groq>=0.0.1
+
+# Search
+tavily-python>=0.3.0

@@ -8,7 +8,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { GradientText, TiltCard, StaggerContainer, StaggerItem } from "@/components/ui/aceternity";
-import { springPresets } from "@/styles/tokens/animations";
+import { springPresets } from "@/styles/tokens";
 
 const diagnosisOptions = [
   {

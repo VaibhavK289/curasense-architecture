@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { springPresets } from "@/styles/tokens/animations";
+import { springPresets } from "@/styles/tokens";
 
 interface StatsCardProps {
   title: string;

@@ -50,6 +50,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Health check endpoint for Docker/K8s
+@app.get("/health")
+def health_check():
+    """Health check endpoint for container orchestration"""
+    return {"status": "healthy", "service": "curasense-ml-api"}
+
 # Input/Output Models
 class InputText(BaseModel):
     text: str

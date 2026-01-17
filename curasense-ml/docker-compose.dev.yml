@@ -1,0 +1,33 @@
+# Development compose file with BuildKit caching
+version: '3.8'
+
+services:
+  ml-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.optimized
+      # Enable BuildKit for cache mounts
+      cache_from:
+        - type=local,src=/tmp/.buildx-cache
+      cache_to:
+        - type=local,dest=/tmp/.buildx-cache
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount code for hot reload in dev
+      - ./src:/app/src
+      # Persist model cache across rebuilds
+      - ml-models-cache:/opt/ml-models
+    environment:
+      - PYTHONUNBUFFERED=1
+      - HF_HOME=/opt/ml-models
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  ml-models-cache:
+    driver: local

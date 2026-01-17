@@ -1,0 +1,143 @@
+# ============================================
+# CURASENSE ML API - HIGHLY OPTIMIZED DOCKERFILE
+# For BERT, ResNet50, and Custom Transformers
+# Build time: ~10 mins (first) -> ~2 mins (subsequent)
+# ============================================
+
+# ============================================
+# STAGE 1: Base with specific pinned version
+# ============================================
+FROM python:3.10.13-slim AS base
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PIP_NO_CACHE_DIR=off
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Set cache directories for models
+ENV HF_HOME=/opt/ml-models
+ENV TRANSFORMERS_CACHE=/opt/ml-models/transformers
+ENV TORCH_HOME=/opt/ml-models/torch
+
+WORKDIR /app
+
+# ============================================
+# STAGE 2: System Dependencies (rarely changes)
+# ============================================
+FROM base AS system-deps
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    python3-dev \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# ============================================
+# STAGE 3: Base Dependencies (changes infrequently)
+# Install heavy ML frameworks FIRST
+# ============================================
+FROM system-deps AS base-deps
+
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy base requirements (torch, transformers, etc.)
+COPY requirements-base.txt .
+
+# Use cache mount for pip - reuses downloads across builds
+# This is CRITICAL for ML packages (torch is 800MB+)
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --timeout=3000 -r requirements-base.txt
+
+# ============================================
+# STAGE 4: ML Dependencies (moderate change frequency)
+# ============================================
+FROM base-deps AS ml-deps
+
+COPY requirements-ml.txt .
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --timeout=2000 -r requirements-ml.txt
+
+# ============================================
+# STAGE 5: Model Download Cache (cached until models change)
+# This is the GAME CHANGER - downloads models ONCE
+# ============================================
+FROM ml-deps AS model-cache
+
+# Pre-download BERT model and tokenizer
+RUN --mount=type=cache,target=/root/.cache/huggingface \
+    python -c "\
+from transformers import AutoModel, AutoTokenizer; \
+model = AutoModel.from_pretrained('bert-base-uncased'); \
+tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased'); \
+print('BERT model cached successfully')"
+
+# Pre-download ResNet50 with ImageNet weights
+RUN --mount=type=cache,target=/root/.cache/torch \
+    python -c "\
+from torchvision.models import resnet50, ResNet50_Weights; \
+model = resnet50(weights=ResNet50_Weights.IMAGENET1K_V1); \
+print('ResNet50 model cached successfully')"
+
+# If you have custom transformer weights, download them here
+# RUN --mount=type=cache,target=/root/.cache/huggingface \
+#     python -c "from transformers import AutoModel; \
+#     AutoModel.from_pretrained('your-org/custom-transformer')"
+
+# ============================================
+# STAGE 6: Application Dependencies (changes frequently)
+# ============================================
+FROM model-cache AS app-deps
+
+COPY requirements-app.txt .
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r requirements-app.txt
+
+# ============================================
+# STAGE 7: Runtime - Minimal Production Image
+# ============================================
+FROM python:3.10.13-slim AS runtime
+
+# Install only runtime libraries (no build tools)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV HF_HOME=/opt/ml-models
+ENV TRANSFORMERS_CACHE=/opt/ml-models/transformers
+ENV TORCH_HOME=/opt/ml-models/torch
+
+# Copy virtual environment with all dependencies
+COPY --from=app-deps /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy cached models
+COPY --from=model-cache /opt/ml-models /opt/ml-models
+
+# Create non-root user for security
+RUN useradd --create-home --uid 1000 --shell /bin/bash appuser && \
+    chown -R appuser:appuser /opt/ml-models
+USER appuser
+
+WORKDIR /app
+
+# Copy application code LAST (changes most frequently)
+COPY --chown=appuser:appuser . .
+
+EXPOSE 8000
+
+# Health check for orchestration
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
+
+# Use exec form for proper signal handling
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]

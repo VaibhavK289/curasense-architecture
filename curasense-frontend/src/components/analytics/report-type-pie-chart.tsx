@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { motion } from "framer-motion";
-import { springPresets } from "@/styles/tokens/animations";
+import { springPresets } from "@/styles/tokens";
 
 interface ReportTypePieChartProps {
   data: Record<string, number>;

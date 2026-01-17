@@ -17,7 +17,7 @@ import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { springPresets } from "@/styles/tokens/animations";
+import { springPresets } from "@/styles/tokens";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 

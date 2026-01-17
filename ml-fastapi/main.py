@@ -50,6 +50,11 @@ async def read_root():
 def root():
     return "PONG"
 
+@app.get("/health")
+def health_check():
+    """Health check endpoint for Docker/K8s"""
+    return {"status": "healthy", "service": "curasense-vision-api"}
+
 def my_shutdown_job():
     print(f"Server shutting down at {datetime.datetime.now()}")
 

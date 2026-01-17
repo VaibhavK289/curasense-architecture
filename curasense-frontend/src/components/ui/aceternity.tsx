@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useRef, useState, MouseEvent as ReactMouseEvent } from "react";
-import { springPresets, animationVariants } from "@/styles/tokens/animations";
+import { springPresets, animationVariants } from "@/styles/tokens";
 
 // ============================================
 // GLOWING BORDER

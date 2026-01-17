@@ -12,7 +12,7 @@ import {
   Cell,
 } from "recharts";
 import { motion } from "framer-motion";
-import { springPresets } from "@/styles/tokens/animations";
+import { springPresets } from "@/styles/tokens";
 
 interface FindingsBarChartProps {
   data: Record<string, number>;

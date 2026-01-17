@@ -1,0 +1,91 @@
+# ============================================
+# CURASENSE - DEVELOPMENT DOCKER COMPOSE
+# Hot reload enabled for all services
+# ============================================
+# Usage: docker compose -f compose.dev.yaml up
+# ============================================
+
+services:
+  # ==========================================
+  # Frontend (Next.js) - Development Mode
+  # ==========================================
+  frontend:
+    build:
+      context: ./curasense-frontend
+      dockerfile: Dockerfile
+      target: deps  # Stop at deps stage for dev
+    container_name: curasense-frontend-dev
+    ports:
+      - "3000:3000"
+    env_file: ./curasense-frontend/.env.local
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_FRONTEND_API=http://backend-ml:8000
+      - NEXT_PUBLIC_ML_API=http://backend-vision:8001
+    volumes:
+      # Mount source code for hot reload
+      - ./curasense-frontend/src:/app/src:ro
+      - ./curasense-frontend/public:/app/public:ro
+    command: npm run dev
+    depends_on:
+      - backend-ml
+      - backend-vision
+    networks:
+      - curasense-dev
+
+  # ==========================================
+  # ML Backend - Development Mode
+  # ==========================================
+  backend-ml:
+    build:
+      context: ./curasense-ml
+      dockerfile: Dockerfile
+    container_name: curasense-ml-dev
+    ports:
+      - "8000:8000"
+    env_file: ./curasense-ml/.env
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - TRANSFORMERS_OFFLINE=0
+    volumes:
+      # Mount source for hot reload
+      - ./curasense-ml/app.py:/app/app.py:ro
+      - ./curasense-ml/src:/app/src:ro
+      - ./curasense-ml/crew:/app/crew:ro
+      # Persist models
+      - ml-models-dev:/opt/ml-models
+    command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - curasense-dev
+
+  # ==========================================
+  # Vision Backend - Development Mode
+  # ==========================================
+  backend-vision:
+    build:
+      context: ./ml-fastapi
+      dockerfile: Dockerfile
+    container_name: curasense-vision-dev
+    ports:
+      - "8001:8001"
+    env_file: ./ml-fastapi/.env
+    volumes:
+      # Mount source for hot reload
+      - ./ml-fastapi/main.py:/app/main.py:ro
+      - ./ml-fastapi/config:/app/config:ro
+      - ./ml-fastapi/cron:/app/cron:ro
+      # Persist ChromaDB
+      - chroma-dev:/app/data/chroma
+    command: uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+    networks:
+      - curasense-dev
+
+volumes:
+  ml-models-dev:
+    driver: local
+  chroma-dev:
+    driver: local
+
+networks:
+  curasense-dev:
+    driver: bridge

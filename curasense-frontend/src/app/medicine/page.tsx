@@ -28,7 +28,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { GradientText, SpotlightCard, AnimatedContainer, StaggerContainer, StaggerItem } from "@/components/ui/aceternity";
 import { cn } from "@/lib/utils";
 import { compareMedicines } from "@/lib/api";
-import { springPresets } from "@/styles/tokens/animations";
+import { springPresets } from "@/styles/tokens";
 
 interface MedicineInfo {
   name: string;

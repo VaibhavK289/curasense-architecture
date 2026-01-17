@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Home, Search, ArrowLeft, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { springPresets } from "@/styles/tokens/animations";
+import { springPresets } from "@/styles/tokens";
 
 export default function NotFound() {
   return (

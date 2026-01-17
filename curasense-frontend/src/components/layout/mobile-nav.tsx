@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GradientText } from "@/components/ui/aceternity";
-import { springPresets } from "@/styles/tokens/animations";
+import { springPresets } from "@/styles/tokens";
 import { useAuth } from "@/lib/auth-context";
 
 const navigation = [

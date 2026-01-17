@@ -1,0 +1,21 @@
+# ============================================
+# ML TOOLS & UTILITIES - MODERATE CHANGES
+# Secondary ML packages
+# ============================================
+
+# Hugging Face ecosystem
+accelerate>=0.25.0
+bitsandbytes>=0.41.0
+huggingface_hub>=0.20.0
+
+# CrewAI for agentic workflows
+crewai>=0.1.0
+crewai-tools>=0.1.0
+
+# LangChain ecosystem
+langchain>=0.1.0
+langchain-google-genai>=0.0.5
+langchain_community>=0.0.10
+
+# Groq for fast inference
+groq>=0.4.0

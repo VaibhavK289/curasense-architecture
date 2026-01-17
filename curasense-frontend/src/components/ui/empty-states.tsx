@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Button } from './button';
-import { animationVariants, springPresets } from '@/styles/tokens/animations';
+import { animationVariants, springPresets } from '@/styles/tokens';
 
 // ================================================
 // EMPTY STATE ICONS (Custom SVG)

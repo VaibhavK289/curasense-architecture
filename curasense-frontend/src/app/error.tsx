@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { AlertTriangle, RefreshCw, Home, Bug } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { springPresets } from "@/styles/tokens/animations";
+import { springPresets } from "@/styles/tokens";
 
 export default function Error({
   error,

@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Target, TrendingUp, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { springPresets } from "@/styles/tokens/animations";
+import { springPresets } from "@/styles/tokens";
 
 interface AccuracyMetricsProps {
   metrics: {

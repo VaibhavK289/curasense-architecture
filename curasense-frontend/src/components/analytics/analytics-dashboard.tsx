@@ -16,7 +16,7 @@ import { UsageChart } from "./usage-chart";
 import { ReportTypePieChart } from "./report-type-pie-chart";
 import { FindingsBarChart } from "./findings-bar-chart";
 import { AccuracyMetrics } from "./accuracy-metrics";
-import { springPresets } from "@/styles/tokens/animations";
+import { springPresets } from "@/styles/tokens";
 
 interface AnalyticsDashboardProps {
   className?: string;

@@ -1,0 +1,165 @@
+# ============================================
+# CURASENSE ML API - DOCKERIGNORE
+# Optimized for ML builds - reduces context by 95%+
+# ============================================
+
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.pyo
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+.conda/
+conda-env/
+
+# IDE and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+.spyderproject
+.spyproject
+
+# Git
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+tests/
+test_*.py
+*_test.py
+conftest.py
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+eggs/
+*.egg
+wheels/
+sdist/
+
+# Environment files (will use Docker env_file)
+.env
+.env.*
+!.env.example
+
+# Documentation
+*.md
+docs/
+README*
+LICENSE
+CHANGELOG*
+
+# Logs
+*.log
+logs/
+output/
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Docker files (don't need these inside container)
+Dockerfile*
+docker-compose*
+.dockerignore
+*.dockerfile
+k8s/
+helm/
+
+# Jupyter notebooks
+*.ipynb
+.ipynb_checkpoints/
+
+# Cache directories
+.cache/
+cache/
+*.cache
+
+# HTML reports (dev only)
+*.html
+!frontend/*.html
+project_flow.html
+report.md
+
+# ============================================
+# ML-SPECIFIC EXCLUSIONS (CRITICAL FOR BUILD SPEED)
+# ============================================
+
+# Pre-trained models (downloaded at build time in Dockerfile)
+*.pt
+*.pth
+*.bin
+*.onnx
+*.safetensors
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+models/
+checkpoints/
+saved_models/
+pretrained/
+
+# Hugging Face cache (built in Docker layer)
+.huggingface/
+.transformers/
+
+# PyTorch cache
+.torch/
+torch_cache/
+
+# Dataset files (should be mounted or downloaded separately)
+*.csv
+*.json
+!config/*.json
+*.parquet
+*.feather
+data/
+datasets/
+
+# Training artifacts
+runs/
+tensorboard/
+wandb/
+mlruns/
+outputs/
+results/
+
+# Large binary files
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Profiling
+*.prof
+profile_output/
+
+# Mini-CDSS (separate service)
+Mini-CDSS/

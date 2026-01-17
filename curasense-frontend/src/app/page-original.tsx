@@ -31,7 +31,7 @@ import {
   DNAPattern,
   HeartbeatDivider,
 } from "@/components/ui/aceternity";
-import { springPresets, animationVariants } from "@/styles/tokens/animations";
+import { springPresets, animationVariants } from "@/styles/tokens";
 import { useAuth } from "@/lib/auth-context";
 
 // Feature cards with semantic category colors

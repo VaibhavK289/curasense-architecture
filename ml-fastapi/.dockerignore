@@ -1,0 +1,128 @@
+# ============================================
+# CURASENSE VISION API - DOCKERIGNORE
+# Optimized for RAG/Vision builds
+# ============================================
+
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.pyo
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+.conda/
+
+# IDE and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Git
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+tests/
+test_*.py
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
+eggs/
+*.egg
+
+# Environment files (will use Docker env_file)
+.env
+.env.*
+!.env.example
+
+# Documentation
+*.md
+docs/
+README*
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker files (don't need these inside container)
+Dockerfile*
+docker-compose*
+.dockerignore
+k8s/
+helm/
+render.yaml
+
+# Jupyter notebooks
+*.ipynb
+.ipynb_checkpoints/
+
+# Cache directories
+.cache/
+cache/
+
+# ============================================
+# VISION/RAG-SPECIFIC EXCLUSIONS
+# ============================================
+
+# ChromaDB local data (should be mounted as volume)
+.chroma/
+chroma_data/
+vector_db/
+
+# Uploaded files (mounted separately)
+uploads/
+temp_uploads/
+
+# Large binary files
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+!static/**
+
+# Model files
+*.pt
+*.pth
+*.bin
+*.onnx
+models/
+
+# Test files
+test_*.py
+*_test.py
+
+# Scripts for local dev
+start_xray_server.bat
+*.bat
+*.sh
+!entrypoint.sh
+
+# Temporary data
+tmp/
+temp/
+*.tmp

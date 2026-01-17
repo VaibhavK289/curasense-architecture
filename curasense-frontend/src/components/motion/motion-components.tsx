@@ -9,7 +9,7 @@ import {
   useInView,
 } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { springPresets } from "@/styles/tokens/animations";
+import { springPresets } from "@/styles/tokens";
 
 // ============================================
 // REVEAL ON SCROLL

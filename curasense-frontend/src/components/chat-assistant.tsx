@@ -18,7 +18,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
 import { sendChatMessage } from "@/lib/api";
-import { springPresets, microInteractions } from "@/styles/tokens/animations";
+import { springPresets, microInteractions } from "@/styles/tokens";
 
 export function ChatAssistant() {
   const {

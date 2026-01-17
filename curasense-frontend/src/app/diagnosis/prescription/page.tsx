@@ -31,7 +31,7 @@ import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
 import { diagnosePDF, diagnoseText } from "@/lib/api";
 import { generateThreadId } from "@/lib/utils";
-import { springPresets } from "@/styles/tokens/animations";
+import { springPresets } from "@/styles/tokens";
 
 // Import ErrorState from the error recovery module
 import { ErrorState } from "@/lib/use-error-recovery";

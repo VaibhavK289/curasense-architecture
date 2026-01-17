@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { FloatingOrb } from "@/components/ui/aceternity";
-import { springPresets } from "@/styles/tokens/animations";
+import { springPresets } from "@/styles/tokens";
 import { useAuth } from "@/lib/auth-context";
 
 export default function ForgotPasswordPage() {
