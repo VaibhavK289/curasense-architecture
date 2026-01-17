@@ -553,8 +553,15 @@ function AuthenticatedDashboard({ userName, isGuest = false }: { userName?: stri
 export default function HomePage() {
   const { isAuthenticated, user, isGuest } = useAuth();
   const heroRef = useRef<HTMLDivElement>(null);
+  const [isHeroMounted, setIsHeroMounted] = useState(false);
+  
+  // Wait for ref to be hydrated before using useScroll
+  useEffect(() => {
+    setIsHeroMounted(true);
+  }, []);
+  
   const { scrollYProgress } = useScroll({
-    target: heroRef,
+    target: isHeroMounted ? heroRef : undefined,
     offset: ["start start", "end start"],
   });
   
