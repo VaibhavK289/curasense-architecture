@@ -1,4 +1,4 @@
-# CuraSense 🏥
+# CuraSense 
 
 > AI-Powered Healthcare Diagnostic Platform for Medical Professionals
 
@@ -8,7 +8,7 @@
 [![Python](https://img.shields.io/badge/Python-3.10+-green.svg)](https://www.python.org/)
 [![Diagnostic Accuracy](https://img.shields.io/badge/Diagnostic%20Accuracy-90%25-brightgreen.svg)](https://github.com/VaibhavK289/curasense-architecture)
 
-## 📋 Table of Contents
+##  Table of Contents
 
 - [Overview](#overview)
 - [Key Features](#key-features)
@@ -22,7 +22,7 @@
 - [Contributing](#contributing)
 - [License](#license)
 
-## 🎯 Overview
+##  Overview
 
 CuraSense is an enterprise-grade healthcare SaaS platform that leverages artificial intelligence to assist medical professionals with diagnostic workflows. The platform provides real-time analysis of medical imaging, prescription validation, and drug interaction detection with 90% diagnostic accuracy.
 
@@ -30,7 +30,7 @@ CuraSense is an enterprise-grade healthcare SaaS platform that leverages artific
 
 **Solution:** CuraSense automates diagnostic workflows using state-of-the-art AI models, reducing analysis time by 75% while maintaining high accuracy and HIPAA compliance.
 
-### 🎖️ Achievements
+###  Achievements
 
 - **90% Diagnostic Accuracy** across medical imaging modalities
 - **75% Reduction** in diagnostic processing time
@@ -38,7 +38,7 @@ CuraSense is an enterprise-grade healthcare SaaS platform that leverages artific
 - **Real-time Analysis** with sub-3 second response times
 - **Multi-modal AI** supporting X-ray, MRI, CT, and prescription analysis
 
-## ✨ Key Features
+##  Key Features
 
 ### 🔬 Medical Imaging Analysis
 - **X-ray Analysis**: Automated detection of fractures, pneumonia, and abnormalities
@@ -46,25 +46,25 @@ CuraSense is an enterprise-grade healthcare SaaS platform that leverages artific
 - **CT Scan Interpretation**: 3D reconstruction and anomaly identification
 - **Multi-format Support**: DICOM, PNG, JPEG, and proprietary medical formats
 
-### 💊 Prescription Intelligence
+###  Prescription Intelligence
 - **OCR-based Extraction**: Handwritten and printed prescription parsing
 - **Drug Interaction Detection**: Real-time cross-referencing with medical databases
 - **Dosage Validation**: AI-powered verification against clinical guidelines
 - **Alternative Suggestions**: Generic and therapeutic equivalents recommendation
 
-### 🔍 Drug Comparison Engine
+###  Drug Comparison Engine
 - **Side-by-side Analysis**: Comparative efficacy and safety profiles
 - **Cost Optimization**: Price comparison across manufacturers
 - **Research Integration**: Latest clinical trial data and peer-reviewed studies
 - **Patient-specific Recommendations**: Personalized based on medical history
 
-### 🤖 AI Agent Workflow
+###  AI Agent Workflow
 - **CrewAI Orchestration**: Multi-agent collaboration for complex diagnostics
 - **RAG Implementation**: Retrieval-augmented generation for evidence-based analysis
 - **Context-aware Processing**: Patient history and clinical guidelines integration
 - **Explainable AI**: Detailed reasoning and confidence scores for all recommendations
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 ### Frontend
 ```
@@ -114,7 +114,7 @@ Vercel             - Frontend hosting (optional)
 NGINX              - Reverse proxy and load balancing
 ```
 
-## 🏗️ Architecture
+##  Architecture
 
 ### High-Level System Design
 
@@ -228,7 +228,7 @@ curasense-architecture/
 - RAG-based analysis with ChromaDB
 - Google Gemini integration for vision
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -360,7 +360,7 @@ Doctor:  doctor@curasense.com  / doctor123!
 Patient: patient@curasense.com / patient123!
 ```
 
-## 🐳 Deployment
+##  Deployment
 
 ### Docker Compose Production
 
@@ -432,7 +432,7 @@ vercel --prod
 
 See [curasense-frontend/VERCEL_DEPLOYMENT.md](curasense-frontend/VERCEL_DEPLOYMENT.md) for details.
 
-## 📚 API Documentation
+##  API Documentation
 
 ### Authentication Endpoints
 
@@ -530,7 +530,7 @@ Content-Type: application/json
 }
 ```
 
-## 📊 Performance Metrics
+##  Performance Metrics
 
 ### Diagnostic Accuracy
 
@@ -557,7 +557,7 @@ Content-Type: application/json
 | ML Backend | 4GB | 2GB |
 | Vision Backend | 2GB | 1GB |
 
-## 🔒 Security & Compliance
+##  Security & Compliance
 
 ### HIPAA Compliance
 
@@ -593,24 +593,24 @@ We welcome contributions!
 - **Backend**: Type hints required
 - **Documentation**: All public APIs must be documented
 
-## 📄 License
+##  License
 
 This project is licensed under the MIT License - see [LICENSE](LICENSE) file for details.
 
-## 👥 Team
+##  Team
 
-**Lead Developer**: Vaibhav Kumar  
+**Lead Developer**: Vaibhav Kumar Kandhway
 **GitHub**: [@VaibhavK289](https://github.com/VaibhavK289)  
-**LinkedIn**: [Connect](https://linkedin.com/in/vaibhavk289)
+**LinkedIn**: [Connect](https://linkedin.com/in/vaibhavkumarkandhway/)
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - Medical NER model by Clinical-AI-Apollo
 - AI models powered by Google Gemini and GROQ
 - Infrastructure supported by Vercel and NeonDB
 - Community feedback from healthcare professionals
 
-## 📞 Support
+##  Support
 
 - **Documentation**: [docs/](docs/)
 - **Issues**: [GitHub Issues](https://github.com/VaibhavK289/curasense-architecture/issues)
