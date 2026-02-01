@@ -4,16 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
-    "postinstall": "prisma generate",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "db:generate": "prisma generate",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio",
-    "vercel-build": "prisma generate && next build"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "db:studio": "prisma studio"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",

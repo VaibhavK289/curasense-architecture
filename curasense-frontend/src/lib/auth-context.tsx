@@ -92,13 +92,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Check for guest mode on mount
+  // Check for guest mode on mount - AUTO-ENABLE for MVP
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // MVP Mode: Auto-enable guest mode for all users
+      // This bypasses login requirement while keeping auth context functional
       const guestMode = localStorage.getItem(GUEST_STORAGE_KEY);
-      if (guestMode === "true") {
-        setIsGuest(true);
+      if (guestMode !== "true") {
+        localStorage.setItem(GUEST_STORAGE_KEY, "true");
       }
+      setIsGuest(true);
+      setIsLoading(false);
     }
   }, []);
 
