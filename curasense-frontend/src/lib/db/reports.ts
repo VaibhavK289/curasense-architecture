@@ -1,9 +1,47 @@
-import prisma from "../prisma";
-import { Report, ReportType, ReportStatus, FileType, Prisma } from "@/generated/prisma";
+/**
+ * ============================================
+ * MVP MODE - DATABASE STUBBED
+ * ============================================
+ * This file has been stubbed for MVP deployment.
+ * All database operations are no-ops.
+ * Guest mode only - no persistent reports.
+ */
 
 // ============================================
-// TYPES
+// TYPES (kept for compatibility)
 // ============================================
+
+export type ReportType = "LAB_RESULT" | "IMAGING" | "PRESCRIPTION" | "CLINICAL_NOTE" | "OTHER";
+export type ReportStatus = "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED" | "ARCHIVED";
+export type FileType = "PDF" | "IMAGE" | "DICOM" | "TEXT" | "OTHER";
+
+export interface Report {
+  id: string;
+  userId: string;
+  title: string;
+  description: string | null;
+  type: ReportType;
+  status: ReportStatus;
+  originalFileName: string | null;
+  fileType: FileType | null;
+  fileSizeBytes: number | null;
+  fileUrl: string | null;
+  fileHash: string | null;
+  summary: string | null;
+  content: string | null;
+  findings: string[];
+  confidenceScore: number | null;
+  processingTimeMs: number | null;
+  aiModelVersion: string | null;
+  errorMessage: string | null;
+  errorCode: string | null;
+  retryCount: number;
+  processedAt: Date | null;
+  archivedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
 
 export interface CreateReportInput {
   userId: string;
@@ -59,152 +97,53 @@ export interface PaginatedResult<T> {
 }
 
 // ============================================
-// REPORT OPERATIONS
+// STUBBED FUNCTIONS
 // ============================================
 
-export async function createReport(input: CreateReportInput): Promise<Report> {
-  const report = await prisma.report.create({
-    data: {
-      userId: input.userId,
-      title: input.title,
-      description: input.description,
-      type: input.type,
-      status: ReportStatus.PENDING,
-      originalFileName: input.originalFileName,
-      fileType: input.fileType,
-      fileSizeBytes: input.fileSizeBytes,
-      fileUrl: input.fileUrl,
-      fileHash: input.fileHash,
-    },
-  });
-
-  // Log the action
-  await prisma.auditLog.create({
-    data: {
-      userId: input.userId,
-      action: "REPORT_CREATE",
-      resource: "Report",
-      resourceId: report.id,
-      details: { type: input.type },
-    },
-  });
-
-  return report;
+export async function createReport(_input: CreateReportInput): Promise<Report> {
+  console.log("[MVP] createReport called - stubbed");
+  throw new Error("MVP mode: Report creation disabled - use demo mode");
 }
 
 export async function getReportById(
-  reportId: string,
-  userId?: string
+  _reportId: string,
+  _userId?: string
 ): Promise<Report | null> {
-  const where: Prisma.ReportWhereInput = {
-    id: reportId,
-    deletedAt: null,
-  };
-
-  if (userId) {
-    where.userId = userId;
-  }
-
-  return prisma.report.findFirst({ where });
+  console.log("[MVP] getReportById called - stubbed");
+  return null;
 }
 
 export async function getReportsByUser(
-  userId: string,
-  filters?: ReportFilters,
+  _userId: string,
+  _filters?: ReportFilters,
   pagination?: PaginationOptions
 ): Promise<PaginatedResult<Report>> {
-  const page = pagination?.page ?? 1;
-  const limit = pagination?.limit ?? 20;
-  const skip = (page - 1) * limit;
-
-  const where: Prisma.ReportWhereInput = {
-    userId,
-    deletedAt: null,
-  };
-
-  if (filters?.type) {
-    where.type = filters.type;
-  }
-
-  if (filters?.status) {
-    where.status = filters.status;
-  }
-
-  if (filters?.fromDate || filters?.toDate) {
-    where.createdAt = {};
-    if (filters.fromDate) {
-      where.createdAt.gte = filters.fromDate;
-    }
-    if (filters.toDate) {
-      where.createdAt.lte = filters.toDate;
-    }
-  }
-
-  if (filters?.search) {
-    where.OR = [
-      { title: { contains: filters.search, mode: "insensitive" } },
-      { description: { contains: filters.search, mode: "insensitive" } },
-      { summary: { contains: filters.search, mode: "insensitive" } },
-    ];
-  }
-
-  const orderBy: Prisma.ReportOrderByWithRelationInput = {
-    [pagination?.sortBy ?? "createdAt"]: pagination?.sortOrder ?? "desc",
-  };
-
-  const [reports, total] = await Promise.all([
-    prisma.report.findMany({
-      where,
-      orderBy,
-      skip,
-      take: limit,
-    }),
-    prisma.report.count({ where }),
-  ]);
-
+  console.log("[MVP] getReportsByUser called - stubbed");
   return {
-    data: reports,
+    data: [],
     pagination: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-      hasMore: skip + reports.length < total,
+      page: pagination?.page ?? 1,
+      limit: pagination?.limit ?? 20,
+      total: 0,
+      totalPages: 0,
+      hasMore: false,
     },
   };
 }
 
 export async function updateReport(
-  reportId: string,
-  userId: string,
-  input: UpdateReportInput
+  _reportId: string,
+  _userId: string,
+  _input: UpdateReportInput
 ): Promise<Report> {
-  const report = await prisma.report.update({
-    where: { id: reportId, userId },
-    data: {
-      ...input,
-      processedAt: input.status === ReportStatus.COMPLETED ? new Date() : undefined,
-    },
-  });
-
-  // Log the action
-  await prisma.auditLog.create({
-    data: {
-      userId,
-      action: "REPORT_UPDATE",
-      resource: "Report",
-      resourceId: reportId,
-      details: { status: input.status },
-    },
-  });
-
-  return report;
+  console.log("[MVP] updateReport called - stubbed");
+  throw new Error("MVP mode: Report updates disabled");
 }
 
 export async function markReportCompleted(
-  reportId: string,
-  userId: string,
-  result: {
+  _reportId: string,
+  _userId: string,
+  _result: {
     summary: string;
     content: string;
     findings: string[];
@@ -213,206 +152,80 @@ export async function markReportCompleted(
     aiModelVersion?: string;
   }
 ): Promise<Report> {
-  return updateReport(reportId, userId, {
-    ...result,
-    status: ReportStatus.COMPLETED,
-  });
+  console.log("[MVP] markReportCompleted called - stubbed");
+  throw new Error("MVP mode: Report updates disabled");
 }
 
 export async function markReportFailed(
-  reportId: string,
-  userId: string,
-  error: {
+  _reportId: string,
+  _userId: string,
+  _error: {
     message: string;
     code?: string;
   }
 ): Promise<Report> {
-  // Get current retry count
-  const current = await prisma.report.findUnique({
-    where: { id: reportId },
-    select: { retryCount: true },
-  });
-
-  return prisma.report.update({
-    where: { id: reportId, userId },
-    data: {
-      status: ReportStatus.FAILED,
-      errorMessage: error.message,
-      errorCode: error.code,
-      retryCount: (current?.retryCount ?? 0) + 1,
-    },
-  });
+  console.log("[MVP] markReportFailed called - stubbed");
+  throw new Error("MVP mode: Report updates disabled");
 }
 
 export async function deleteReport(
-  reportId: string,
-  userId: string,
-  hardDelete = false
+  _reportId: string,
+  _userId: string,
+  _hardDelete = false
 ): Promise<void> {
-  if (hardDelete) {
-    await prisma.report.delete({
-      where: { id: reportId, userId },
-    });
-  } else {
-    await prisma.report.update({
-      where: { id: reportId, userId },
-      data: { deletedAt: new Date() },
-    });
-  }
-
-  // Log the action
-  await prisma.auditLog.create({
-    data: {
-      userId,
-      action: hardDelete ? "REPORT_DELETE_HARD" : "REPORT_DELETE_SOFT",
-      resource: "Report",
-      resourceId: reportId,
-    },
-  });
+  console.log("[MVP] deleteReport called - stubbed");
 }
 
 export async function archiveReport(
-  reportId: string,
-  userId: string
+  _reportId: string,
+  _userId: string
 ): Promise<Report> {
-  return prisma.report.update({
-    where: { id: reportId, userId },
-    data: {
-      status: ReportStatus.ARCHIVED,
-      archivedAt: new Date(),
-    },
-  });
+  console.log("[MVP] archiveReport called - stubbed");
+  throw new Error("MVP mode: Report archiving disabled");
 }
 
 // ============================================
-// ANALYTICS QUERIES
+// ANALYTICS QUERIES (stubbed)
 // ============================================
 
-export async function getReportStats(userId: string) {
-  const [
-    totalReports,
-    reportsByType,
-    reportsByStatus,
-    avgMetrics,
-    recentFindings,
-  ] = await Promise.all([
-    // Total count
-    prisma.report.count({
-      where: { userId, deletedAt: null },
-    }),
-
-    // Count by type
-    prisma.report.groupBy({
-      by: ["type"],
-      where: { userId, deletedAt: null },
-      _count: { id: true },
-    }),
-
-    // Count by status
-    prisma.report.groupBy({
-      by: ["status"],
-      where: { userId, deletedAt: null },
-      _count: { id: true },
-    }),
-
-    // Average metrics for completed reports
-    prisma.report.aggregate({
-      where: {
-        userId,
-        status: ReportStatus.COMPLETED,
-        deletedAt: null,
-      },
-      _avg: {
-        confidenceScore: true,
-        processingTimeMs: true,
-      },
-    }),
-
-    // Get all findings from last 30 days
-    prisma.report.findMany({
-      where: {
-        userId,
-        status: ReportStatus.COMPLETED,
-        deletedAt: null,
-        createdAt: {
-          gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-        },
-      },
-      select: { findings: true },
-    }),
-  ]);
-
-  // Aggregate findings frequency
-  const findingsFrequency: Record<string, number> = {};
-  recentFindings.forEach((report) => {
-    report.findings.forEach((finding) => {
-      findingsFrequency[finding] = (findingsFrequency[finding] || 0) + 1;
-    });
-  });
-
+export async function getReportStats(_userId: string) {
+  console.log("[MVP] getReportStats called - stubbed");
   return {
-    totalReports,
-    reportsByType: Object.fromEntries(
-      reportsByType.map((r) => [r.type, r._count.id])
-    ),
-    reportsByStatus: Object.fromEntries(
-      reportsByStatus.map((r) => [r.status, r._count.id])
-    ),
-    averageConfidence: avgMetrics._avg.confidenceScore ?? 0,
-    averageProcessingTime: avgMetrics._avg.processingTimeMs ?? 0,
-    findingsFrequency,
+    totalReports: 0,
+    reportsByType: {},
+    reportsByStatus: {},
+    averageConfidence: 0,
+    averageProcessingTime: 0,
+    findingsFrequency: {},
   };
 }
 
-export async function getDailyUsage(userId: string, days = 30) {
+export async function getDailyUsage(_userId: string, days = 30) {
+  console.log("[MVP] getDailyUsage called - stubbed");
+  const result: Array<{ date: string; count: number }> = [];
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - days);
-  startDate.setHours(0, 0, 0, 0);
-
-  const reports = await prisma.report.findMany({
-    where: {
-      userId,
-      deletedAt: null,
-      createdAt: { gte: startDate },
-    },
-    select: { createdAt: true },
-    orderBy: { createdAt: "asc" },
-  });
-
-  // Group by date
-  const dailyMap: Record<string, number> = {};
   
-  // Initialize all days with 0
   for (let i = 0; i < days; i++) {
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + i);
-    dailyMap[date.toISOString().split("T")[0]] = 0;
+    result.push({
+      date: date.toISOString().split("T")[0],
+      count: 0,
+    });
   }
-
-  // Count reports per day
-  reports.forEach((report) => {
-    const date = report.createdAt.toISOString().split("T")[0];
-    if (dailyMap[date] !== undefined) {
-      dailyMap[date]++;
-    }
-  });
-
-  return Object.entries(dailyMap).map(([date, count]) => ({ date, count }));
+  
+  return result;
 }
 
 // ============================================
-// DEDUPLICATION
+// DEDUPLICATION (stubbed)
 // ============================================
 
 export async function findDuplicateReport(
-  userId: string,
-  fileHash: string
+  _userId: string,
+  _fileHash: string
 ): Promise<Report | null> {
-  return prisma.report.findFirst({
-    where: {
-      userId,
-      fileHash,
-      deletedAt: null,
-    },
-  });
+  console.log("[MVP] findDuplicateReport called - stubbed");
+  return null;
 }

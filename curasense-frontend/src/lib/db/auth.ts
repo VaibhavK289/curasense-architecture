@@ -1,20 +1,40 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import prisma from "../prisma";
-import { User, UserRole, UserStatus } from "@/generated/prisma";
+/**
+ * ============================================
+ * MVP MODE - DATABASE STUBBED
+ * ============================================
+ * This file has been stubbed for MVP deployment.
+ * All database operations are no-ops.
+ * Guest mode only - no authentication required.
+ */
 
 // ============================================
-// CONFIGURATION
+// TYPES (kept for compatibility)
 // ============================================
 
-const SALT_ROUNDS = 12;
-const JWT_SECRET = process.env.JWT_SECRET || "your-super-secret-key-change-in-production";
-const JWT_EXPIRES_IN = "7d";
-const REFRESH_TOKEN_EXPIRES_IN = 30 * 24 * 60 * 60 * 1000; // 30 days in ms
+export type UserRole = "PATIENT" | "DOCTOR" | "ADMIN";
+export type UserStatus = "ACTIVE" | "INACTIVE" | "PENDING_VERIFICATION" | "SUSPENDED";
 
-// ============================================
-// TYPES
-// ============================================
+export interface User {
+  id: string;
+  email: string;
+  passwordHash: string;
+  firstName: string;
+  lastName: string;
+  displayName: string | null;
+  phone: string | null;
+  dateOfBirth: Date | null;
+  avatarUrl: string | null;
+  role: UserRole;
+  status: UserStatus;
+  preferences: Record<string, unknown> | null;
+  failedLoginCount: number;
+  lockedUntil: Date | null;
+  lastLoginAt: Date | null;
+  lastLoginIp: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
 
 export interface UserPayload {
   id: string;
@@ -47,229 +67,79 @@ export interface LoginInput {
 }
 
 // ============================================
-// PASSWORD UTILITIES
+// STUBBED FUNCTIONS
 // ============================================
 
-export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, SALT_ROUNDS);
+export async function hashPassword(_password: string): Promise<string> {
+  console.log("[MVP] hashPassword called - stubbed");
+  return "stubbed-hash";
 }
 
 export async function verifyPassword(
-  password: string,
-  hash: string
+  _password: string,
+  _hash: string
 ): Promise<boolean> {
-  return bcrypt.compare(password, hash);
+  console.log("[MVP] verifyPassword called - stubbed");
+  return false;
 }
 
-// ============================================
-// JWT UTILITIES
-// ============================================
-
-export function generateAccessToken(user: UserPayload): string {
-  return jwt.sign(
-    {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      firstName: user.firstName,
-      lastName: user.lastName,
-    },
-    JWT_SECRET,
-    { expiresIn: JWT_EXPIRES_IN }
-  );
+export function generateAccessToken(_user: UserPayload): string {
+  console.log("[MVP] generateAccessToken called - stubbed");
+  return "stubbed-access-token";
 }
 
-export function verifyAccessToken(token: string): UserPayload | null {
-  try {
-    return jwt.verify(token, JWT_SECRET) as UserPayload;
-  } catch {
-    return null;
-  }
+export function verifyAccessToken(_token: string): UserPayload | null {
+  console.log("[MVP] verifyAccessToken called - stubbed");
+  // Return a guest user for MVP mode
+  return {
+    id: "guest",
+    email: "guest@curasense.local",
+    role: "PATIENT",
+    firstName: "Guest",
+    lastName: "User",
+  };
 }
 
 export function generateRefreshToken(): string {
-  return crypto.randomUUID() + crypto.randomUUID();
+  console.log("[MVP] generateRefreshToken called - stubbed");
+  return "stubbed-refresh-token";
 }
 
-// ============================================
-// USER OPERATIONS
-// ============================================
-
-export async function createUser(input: RegisterInput): Promise<User> {
-  const existingUser = await prisma.user.findUnique({
-    where: { email: input.email.toLowerCase() },
-  });
-
-  if (existingUser) {
-    throw new Error("Email already registered");
-  }
-
-  const passwordHash = await hashPassword(input.password);
-
-  return prisma.user.create({
-    data: {
-      email: input.email.toLowerCase(),
-      passwordHash,
-      firstName: input.firstName,
-      lastName: input.lastName,
-      displayName: `${input.firstName} ${input.lastName}`,
-      phone: input.phone,
-      dateOfBirth: input.dateOfBirth,
-      role: UserRole.PATIENT,
-      status: UserStatus.ACTIVE, // In production, set to PENDING_VERIFICATION
-    },
-  });
+export async function createUser(_input: RegisterInput): Promise<User> {
+  console.log("[MVP] createUser called - stubbed");
+  throw new Error("MVP mode: Registration disabled");
 }
 
 export async function authenticateUser(
-  input: LoginInput
+  _input: LoginInput
 ): Promise<{ user: User; tokens: AuthTokens }> {
-  const user = await prisma.user.findUnique({
-    where: { email: input.email.toLowerCase() },
-  });
-
-  if (!user) {
-    throw new Error("Invalid email or password");
-  }
-
-  // Check if account is locked
-  if (user.lockedUntil && user.lockedUntil > new Date()) {
-    throw new Error(
-      `Account locked. Try again after ${user.lockedUntil.toISOString()}`
-    );
-  }
-
-  // Check if account is active
-  if (user.status !== UserStatus.ACTIVE) {
-    throw new Error(`Account is ${user.status.toLowerCase()}`);
-  }
-
-  const isValid = await verifyPassword(input.password, user.passwordHash);
-
-  if (!isValid) {
-    // Increment failed login count
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        failedLoginCount: { increment: 1 },
-        // Lock account after 5 failed attempts for 15 minutes
-        lockedUntil:
-          user.failedLoginCount >= 4
-            ? new Date(Date.now() + 15 * 60 * 1000)
-            : null,
-      },
-    });
-    throw new Error("Invalid email or password");
-  }
-
-  // Reset failed login count on successful login
-  const refreshToken = generateRefreshToken();
-  
-  // Create session
-  await prisma.session.create({
-    data: {
-      userId: user.id,
-      token: refreshToken,
-      ipAddress: input.ipAddress,
-      userAgent: input.userAgent,
-      expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRES_IN),
-    },
-  });
-
-  // Update user last login
-  await prisma.user.update({
-    where: { id: user.id },
-    data: {
-      failedLoginCount: 0,
-      lockedUntil: null,
-      lastLoginAt: new Date(),
-      lastLoginIp: input.ipAddress,
-    },
-  });
-
-  // Log the action
-  await prisma.auditLog.create({
-    data: {
-      userId: user.id,
-      action: "LOGIN",
-      resource: "Session",
-      ipAddress: input.ipAddress,
-      userAgent: input.userAgent,
-    },
-  });
-
-  const accessToken = generateAccessToken({
-    id: user.id,
-    email: user.email,
-    role: user.role,
-    firstName: user.firstName,
-    lastName: user.lastName,
-  });
-
-  return {
-    user,
-    tokens: {
-      accessToken,
-      refreshToken,
-      expiresIn: 7 * 24 * 60 * 60, // 7 days in seconds
-    },
-  };
+  console.log("[MVP] authenticateUser called - stubbed");
+  throw new Error("MVP mode: Authentication disabled");
 }
 
 export async function refreshAccessToken(
-  refreshToken: string
+  _refreshToken: string
 ): Promise<AuthTokens | null> {
-  const session = await prisma.session.findUnique({
-    where: { token: refreshToken },
-    include: { user: true },
-  });
-
-  if (!session || session.expiresAt < new Date()) {
-    return null;
-  }
-
-  // Update session last active
-  await prisma.session.update({
-    where: { id: session.id },
-    data: { lastActiveAt: new Date() },
-  });
-
-  const newAccessToken = generateAccessToken({
-    id: session.user.id,
-    email: session.user.email,
-    role: session.user.role,
-    firstName: session.user.firstName,
-    lastName: session.user.lastName,
-  });
-
-  return {
-    accessToken: newAccessToken,
-    refreshToken,
-    expiresIn: 7 * 24 * 60 * 60,
-  };
+  console.log("[MVP] refreshAccessToken called - stubbed");
+  return null;
 }
 
-export async function logoutUser(refreshToken: string): Promise<void> {
-  await prisma.session.delete({
-    where: { token: refreshToken },
-  });
+export async function logoutUser(_refreshToken: string): Promise<void> {
+  console.log("[MVP] logoutUser called - stubbed");
 }
 
-export async function logoutAllSessions(userId: string): Promise<void> {
-  await prisma.session.deleteMany({
-    where: { userId },
-  });
+export async function logoutAllSessions(_userId: string): Promise<void> {
+  console.log("[MVP] logoutAllSessions called - stubbed");
 }
 
-export async function getUserById(id: string): Promise<User | null> {
-  return prisma.user.findUnique({
-    where: { id, deletedAt: null },
-  });
+export async function getUserById(_id: string): Promise<User | null> {
+  console.log("[MVP] getUserById called - stubbed");
+  return null;
 }
 
 export async function updateUserProfile(
-  userId: string,
-  data: Partial<{
+  _userId: string,
+  _data: Partial<{
     firstName: string;
     lastName: string;
     displayName: string;
@@ -278,143 +148,30 @@ export async function updateUserProfile(
     preferences: Record<string, unknown>;
   }>
 ): Promise<User> {
-  const displayName = data.firstName && data.lastName 
-    ? `${data.firstName} ${data.lastName}` 
-    : data.displayName;
-    
-  return prisma.user.update({
-    where: { id: userId },
-    data: {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      displayName,
-      phone: data.phone,
-      avatarUrl: data.avatarUrl,
-      preferences: data.preferences as object | undefined,
-    },
-  });
+  console.log("[MVP] updateUserProfile called - stubbed");
+  throw new Error("MVP mode: Profile updates disabled");
 }
 
-// ============================================
-// PASSWORD RESET OPERATIONS
-// ============================================
-
-const RESET_TOKEN_EXPIRES_IN = 60 * 60 * 1000; // 1 hour in ms
-
-export async function createPasswordResetToken(email: string): Promise<{ token: string; user: User } | null> {
-  const user = await prisma.user.findUnique({
-    where: { email: email.toLowerCase() },
-  });
-
-  if (!user) {
-    // Don't reveal if email exists or not
-    return null;
-  }
-
-  // Delete any existing tokens for this email
-  await prisma.passwordResetToken.deleteMany({
-    where: { email: email.toLowerCase() },
-  });
-
-  // Generate a secure token
-  const token = crypto.randomUUID() + crypto.randomUUID();
-
-  await prisma.passwordResetToken.create({
-    data: {
-      email: email.toLowerCase(),
-      token,
-      expiresAt: new Date(Date.now() + RESET_TOKEN_EXPIRES_IN),
-    },
-  });
-
-  return { token, user };
+export async function createPasswordResetToken(_email: string): Promise<{ token: string; user: User } | null> {
+  console.log("[MVP] createPasswordResetToken called - stubbed");
+  return null;
 }
 
-export async function verifyPasswordResetToken(token: string): Promise<string | null> {
-  const resetToken = await prisma.passwordResetToken.findUnique({
-    where: { token },
-  });
-
-  if (!resetToken) {
-    return null;
-  }
-
-  if (resetToken.expiresAt < new Date()) {
-    // Token expired, delete it
-    await prisma.passwordResetToken.delete({
-      where: { id: resetToken.id },
-    });
-    return null;
-  }
-
-  if (resetToken.usedAt) {
-    // Token already used
-    return null;
-  }
-
-  return resetToken.email;
+export async function verifyPasswordResetToken(_token: string): Promise<string | null> {
+  console.log("[MVP] verifyPasswordResetToken called - stubbed");
+  return null;
 }
 
-export async function resetPassword(token: string, newPassword: string): Promise<boolean> {
-  const email = await verifyPasswordResetToken(token);
-  
-  if (!email) {
-    return false;
-  }
-
-  const passwordHash = await hashPassword(newPassword);
-
-  // Update user password
-  await prisma.user.update({
-    where: { email },
-    data: { 
-      passwordHash,
-      failedLoginCount: 0,
-      lockedUntil: null,
-    },
-  });
-
-  // Mark token as used
-  await prisma.passwordResetToken.update({
-    where: { token },
-    data: { usedAt: new Date() },
-  });
-
-  // Invalidate all existing sessions for security
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (user) {
-    await prisma.session.deleteMany({
-      where: { userId: user.id },
-    });
-  }
-
-  return true;
+export async function resetPassword(_token: string, _newPassword: string): Promise<boolean> {
+  console.log("[MVP] resetPassword called - stubbed");
+  return false;
 }
 
 export async function changePassword(
-  userId: string, 
-  currentPassword: string, 
-  newPassword: string
+  _userId: string,
+  _currentPassword: string,
+  _newPassword: string
 ): Promise<boolean> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-  });
-
-  if (!user) {
-    return false;
-  }
-
-  const isValid = await verifyPassword(currentPassword, user.passwordHash);
-  if (!isValid) {
-    return false;
-  }
-
-  const passwordHash = await hashPassword(newPassword);
-  
-  await prisma.user.update({
-    where: { id: userId },
-    data: { passwordHash },
-  });
-
-  return true;
+  console.log("[MVP] changePassword called - stubbed");
+  return false;
 }
