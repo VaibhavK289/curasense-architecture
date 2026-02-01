@@ -28,8 +28,29 @@ export async function POST(request: NextRequest) {
     
     clearTimeout(timeoutId);
 
-    // Get the response data
-    const data = await response.json();
+    // Get the response text first to handle non-JSON errors
+    const responseText = await response.text();
+    
+    // Try to parse as JSON
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      // Backend returned non-JSON response (likely an error page or plain text)
+      console.error("Backend returned non-JSON response:", responseText.substring(0, 500));
+      return NextResponse.json(
+        { 
+          status: "error", 
+          error: `Backend error: ${responseText.substring(0, 200)}`,
+          debug: {
+            backendUrl: BACKEND_URL,
+            statusCode: response.status,
+            statusText: response.statusText
+          }
+        },
+        { status: 502 }
+      );
+    }
 
     // Return the response
     return NextResponse.json(data, { status: response.status });
@@ -38,7 +59,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         status: "error", 
-        error: error instanceof Error ? error.message : "Failed to analyze text" 
+        error: error instanceof Error ? error.message : "Failed to analyze text",
+        debug: {
+          backendUrl: BACKEND_URL
+        }
       },
       { status: 500 }
     );
