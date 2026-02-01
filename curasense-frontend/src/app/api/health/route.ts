@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   const startTime = Date.now();
+  
+  // Check if DATABASE_URL is configured (without exposing the actual value)
+  const hasDatabaseUrl = !!process.env.DATABASE_URL;
+  const databaseUrlPrefix = process.env.DATABASE_URL?.substring(0, 15) || "not set";
 
   try {
     // Test database connection
@@ -16,6 +20,7 @@ export async function GET() {
         database: {
           status: "connected",
           latency: `${dbLatency}ms`,
+          configured: hasDatabaseUrl,
         },
       },
       version: process.env.npm_package_version || "1.0.0",
@@ -23,6 +28,8 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Health check failed:", error);
+    console.error("DATABASE_URL configured:", hasDatabaseUrl);
+    console.error("DATABASE_URL prefix:", databaseUrlPrefix);
 
     return NextResponse.json(
       {
@@ -32,6 +39,8 @@ export async function GET() {
           database: {
             status: "disconnected",
             error: error instanceof Error ? error.message : "Unknown error",
+            configured: hasDatabaseUrl,
+            urlPrefix: databaseUrlPrefix,
           },
         },
         environment: process.env.NODE_ENV,
