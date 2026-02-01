@@ -40,7 +40,7 @@ CuraSense is an enterprise-grade healthcare SaaS platform that leverages artific
 
 ##  Key Features
 
-### 🔬 Medical Imaging Analysis
+###  Medical Imaging Analysis
 - **X-ray Analysis**: Automated detection of fractures, pneumonia, and abnormalities
 - **MRI Processing**: Advanced tissue analysis and tumor detection
 - **CT Scan Interpretation**: 3D reconstruction and anomaly identification
@@ -575,7 +575,7 @@ Content-Type: application/json
 - Account lockout after failed login attempts
 - SQL injection prevention via Prisma ORM
 
-## 🤝 Contributing
+##  Contributing
 
 We welcome contributions! 
 

@@ -1,8 +1,11 @@
 import { PrismaClient } from "@/generated/prisma";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool, neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
 
 // Configure Neon for serverless environments (Vercel)
+// Use WebSocket for serverless - this is required for Neon on Vercel
+neonConfig.webSocketConstructor = ws;
 neonConfig.useSecureWebSocket = true;
 neonConfig.pipelineConnect = "password";
 
@@ -47,15 +50,12 @@ function getDatabaseUrl(): string {
 function createPrismaClient(): PrismaClient {
   const connectionString = getDatabaseUrl();
   
-  // Use Neon serverless Pool for better cold start performance on Vercel
-  const pool = globalForPrisma.pool ?? new Pool({ 
-    connectionString,
-    // Optimized settings for serverless
-    max: 1, // Single connection for serverless functions
-    idleTimeoutMillis: 10000,
-    connectionTimeoutMillis: 5000,
-  });
+  console.log("[Prisma] Creating client with connection string prefix:", connectionString.substring(0, 30));
   
+  // Create Neon serverless Pool with explicit connection string
+  const pool = new Pool({ connectionString });
+  
+  // Cache pool in development to prevent connection exhaustion during hot reload
   if (process.env.NODE_ENV !== "production") {
     globalForPrisma.pool = pool;
   }
