@@ -1,44 +1,21 @@
-import { NextRequest, NextResponse } from "next/server";
-import { logoutUser } from "@/lib/db/auth";
+import { NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
-  try {
-    const refreshToken = request.cookies.get("refreshToken")?.value;
+// MVP MODE: Auth disabled - guest only
 
-    if (refreshToken) {
-      await logoutUser(refreshToken);
-    }
+export async function POST() {
+  const response = NextResponse.json({
+    message: "MVP Mode - Logged out (guest mode)",
+    mode: "guest",
+  });
 
-    const response = NextResponse.json({
-      message: "Logged out successfully",
-    });
+  // Clear any cookies just in case
+  response.cookies.set("refreshToken", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 0,
+    path: "/",
+  });
 
-    // Clear refresh token cookie
-    response.cookies.set("refreshToken", "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 0,
-      path: "/",
-    });
-
-    return response;
-  } catch (error) {
-    console.error("Logout error:", error);
-    
-    // Still clear the cookie even if server-side logout fails
-    const response = NextResponse.json({
-      message: "Logged out",
-    });
-
-    response.cookies.set("refreshToken", "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 0,
-      path: "/",
-    });
-
-    return response;
-  }
+  return response;
 }
