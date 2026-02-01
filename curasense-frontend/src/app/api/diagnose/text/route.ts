@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Backend URL - server-side only (not NEXT_PUBLIC_)
-const BACKEND_URL = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_FRONTEND_API || "http://localhost:8000";
+// Backend URL - server-side only
+// Uses BACKEND_API_URL from Vercel environment variables (Azure Container Apps)
+const BACKEND_URL = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_ML_API_URL || "http://localhost:8000";
 
 // Max duration for Vercel hobby plan (60s max)
 export const maxDuration = 60;

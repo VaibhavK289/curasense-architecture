@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // Backend URL - server-side only
-const BACKEND_URL = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_FRONTEND_API || "http://localhost:8000";
+// Uses BACKEND_API_URL from Vercel environment variables (Azure Container Apps)
+const BACKEND_URL = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_ML_API_URL || "http://localhost:8000";
 
 export async function POST(request: NextRequest) {
   try {

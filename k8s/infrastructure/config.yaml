@@ -25,9 +25,9 @@ metadata:
     app: curasense
 data:
   # Frontend config
-  NEXT_PUBLIC_FRONTEND_API: "http://localhost:8000"
-  NEXT_PUBLIC_ML_API: "http://localhost:8000"
-  NEXT_PUBLIC_VISION_API: "http://localhost:8001"
+  BACKEND_API_URL: "http://localhost:8000"
+  NEXT_PUBLIC_ML_API_URL: "http://localhost:8000"
+  NEXT_PUBLIC_VISION_API_URL: "http://localhost:8001"
   NEXT_PUBLIC_API_TIMEOUT: "30000"
   NODE_ENV: "production"
   NEXT_TELEMETRY_DISABLED: "1"

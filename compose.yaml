@@ -25,9 +25,9 @@ services:
     env_file: ./curasense-frontend/.env.local
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_FRONTEND_API=http://backend-ml:8000
-      - NEXT_PUBLIC_ML_API=http://backend-vision:8001
       - BACKEND_API_URL=http://backend-ml:8000
+      - NEXT_PUBLIC_ML_API_URL=http://backend-ml:8000
+      - NEXT_PUBLIC_VISION_API_URL=http://backend-vision:8001
     depends_on:
       backend-ml:
         condition: service_healthy

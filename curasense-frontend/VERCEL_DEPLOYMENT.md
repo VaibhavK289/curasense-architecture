@@ -1,10 +1,13 @@
 # CuraSense Vercel Deployment Guide
 
+> **Note**: ML backends are deployed on **Azure Container Apps**. See [azure_deployment_guide.md](../azure_deployment_guide.md) for Azure setup.
+
 ## Prerequisites
 
 1. **GitHub Account** - Repository already at: https://github.com/VaibhavK289/curasense-architecture
 2. **Vercel Account** - Sign up at [vercel.com](https://vercel.com)
 3. **Neon DB Account** - Sign up at [neon.tech](https://neon.tech) (free tier available)
+4. **Azure Account** - For ML backend deployment
 
 ## Step 1: Set Up Neon Database
 
@@ -36,7 +39,7 @@ Or use Neon's SQL Editor to run the migration SQL.
 4. Configure:
    - **Framework Preset**: Next.js
    - **Root Directory**: `curasense-frontend`
-   - **Build Command**: `prisma generate && next build`
+   - **Build Command**: `next build`
    - **Install Command**: `npm install`
 
 5. Add Environment Variables:
@@ -45,8 +48,9 @@ Or use Neon's SQL Editor to run the migration SQL.
    | `DATABASE_URL` | Your Neon pooled connection string | Production, Preview |
    | `JWT_SECRET` | Generate with `openssl rand -base64 64` | Production, Preview |
    | `JWT_REFRESH_SECRET` | Generate another secret | Production, Preview |
-   | `NEXT_PUBLIC_ML_API_URL` | Your ML backend URL (see below) | Production, Preview |
-   | `NEXT_PUBLIC_VISION_API_URL` | Your Vision backend URL | Production, Preview |
+   | `BACKEND_API_URL` | Your Azure ML API URL | Production, Preview |
+   | `NEXT_PUBLIC_ML_API_URL` | Your Azure ML API URL | Production, Preview |
+   | `NEXT_PUBLIC_VISION_API_URL` | Your Azure Vision API URL | Production, Preview |
 
 6. Click "Deploy"
 
@@ -64,39 +68,26 @@ vercel login
 vercel --prod
 ```
 
-## Step 3: Deploy ML Backends
+## Step 3: Deploy ML Backends on Azure
 
-The Python ML backends (FastAPI) need to be deployed separately since Vercel doesn't support Python runtimes for long-running ML tasks.
+The Python ML backends (FastAPI) are deployed on **Azure Container Apps**.
 
-### Recommended: Deploy to Render (Free Tier)
+### See Azure Deployment Guide
 
-1. Go to [render.com](https://render.com) and sign up
-2. Create a new Web Service for each backend:
+📖 **Full instructions**: [azure_deployment_guide.md](../azure_deployment_guide.md)
 
-#### ML Backend (Port 8000)
-- **Repository**: Same GitHub repo
-- **Root Directory**: `ml-fastapi`
-- **Runtime**: Python 3
-- **Build Command**: `pip install -r requirements.txt`
-- **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-- **Environment Variables**: Add your API keys (Gemini, etc.)
+### Quick Reference
 
-#### Vision Backend (Port 8001)
-- **Repository**: Same GitHub repo
-- **Root Directory**: `curasense-ml`
-- **Runtime**: Python 3
-- **Build Command**: `pip install -r requirements.txt`
-- **Start Command**: `uvicorn app:app --host 0.0.0.0 --port $PORT`
+After Azure deployment, you'll have URLs like:
+```
+ML API: https://ml-api.xxx.centralindia.azurecontainerapps.io
+Vision API: https://vision-api.xxx.centralindia.azurecontainerapps.io
+```
 
-3. Copy the Render URLs and add them to Vercel environment variables:
-   - `NEXT_PUBLIC_ML_API_URL=https://curasense-ml.onrender.com`
-   - `NEXT_PUBLIC_VISION_API_URL=https://curasense-vision.onrender.com`
-
-### Alternative: Deploy to Railway
-
-1. Go to [railway.app](https://railway.app)
-2. Connect your GitHub repo
-3. Deploy each backend as a separate service
+Add these to Vercel environment variables:
+- `BACKEND_API_URL=https://ml-api.xxx.centralindia.azurecontainerapps.io`
+- `NEXT_PUBLIC_ML_API_URL=https://ml-api.xxx.centralindia.azurecontainerapps.io`
+- `NEXT_PUBLIC_VISION_API_URL=https://vision-api.xxx.centralindia.azurecontainerapps.io`
 
 ## Step 4: Configure Custom Domain (Optional)
 
@@ -116,9 +107,10 @@ DATABASE_URL=postgresql://user:pass@ep-xxx-pooler.region.neon.tech/neondb?sslmod
 JWT_SECRET=your-64-character-secure-secret
 JWT_REFRESH_SECRET=another-64-character-secure-secret
 
-# ML Backends (use your deployed URLs)
-NEXT_PUBLIC_ML_API_URL=https://your-ml-backend.onrender.com
-NEXT_PUBLIC_VISION_API_URL=https://your-vision-backend.onrender.com
+# ML Backends (Azure Container Apps URLs)
+BACKEND_API_URL=https://ml-api.xxx.centralindia.azurecontainerapps.io
+NEXT_PUBLIC_ML_API_URL=https://ml-api.xxx.centralindia.azurecontainerapps.io
+NEXT_PUBLIC_VISION_API_URL=https://vision-api.xxx.centralindia.azurecontainerapps.io
 ```
 
 ### Optional
@@ -147,14 +139,9 @@ This deployment is optimized for Vercel's free tier:
 
 ## Troubleshooting
 
-### Build Fails: Prisma Generate
+### Build Fails
 
-Ensure `postinstall` script exists in package.json:
-```json
-"scripts": {
-  "postinstall": "prisma generate"
-}
-```
+Ensure the build command is `next build` (Prisma is disabled for MVP mode).
 
 ### Database Connection Errors
 
@@ -162,34 +149,52 @@ Ensure `postinstall` script exists in package.json:
 2. Verify SSL mode: `?sslmode=require`
 3. Check Neon project isn't paused (free tier pauses after inactivity)
 
-### ML Backend Timeouts
+### ML Backend Errors
 
-The ML backends may spin down on free tiers. First request after idle may take 30-60 seconds.
+1. Verify `BACKEND_API_URL` is set correctly in Vercel
+2. Test Azure backend health: `curl https://your-ml-api.azurecontainerapps.io/health`
+3. Check Azure Container Apps logs for errors
 
 ### CORS Errors
 
-Ensure ML backends have CORS configured for your Vercel domain:
-```python
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["https://curasense.vercel.app", "https://your-domain.com"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+Ensure Azure backends have `ALLOWED_ORIGINS` environment variable set to your Vercel URL:
+```
+ALLOWED_ORIGINS=https://curasense-frontend.vercel.app
 ```
 
 ## Post-Deployment Checklist
 
-- [ ] Verify database connection works
-- [ ] Test user registration/login
+- [ ] Verify frontend loads correctly
 - [ ] Test ML diagnosis endpoints
 - [ ] Check X-ray analysis works
-- [ ] Verify all pages load correctly
+- [ ] Verify Azure backend health endpoints
 - [ ] Set up monitoring (optional: Vercel Analytics)
+
+## Architecture Summary
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         USERS                                   │
+│                           │                                     │
+│                           ▼                                     │
+│                    ┌────────────────┐                           │
+│                    │    VERCEL      │ ◄── Next.js Frontend      │
+│                    │  (Free Tier)   │                           │
+│                    └───────┬────────┘                           │
+│                            │                                    │
+│              ┌─────────────┴─────────────┐                      │
+│              ▼                           ▼                      │
+│     ┌────────────────┐          ┌────────────────┐              │
+│     │   ML API       │          │  Vision API    │              │
+│     │ Azure ACA      │          │  Azure ACA     │              │
+│     │ Port 8000      │          │  Port 8001     │              │
+│     └────────────────┘          └────────────────┘              │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ## Support
 
-For issues, create a GitHub issue or check:
+For issues, check:
 - [Vercel Docs](https://vercel.com/docs)
-- [Neon Docs](https://neon.tech/docs)
+- [Azure Container Apps Docs](https://docs.microsoft.com/azure/container-apps/)
 - [Next.js Docs](https://nextjs.org/docs)

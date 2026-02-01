@@ -223,22 +223,23 @@ Database:  Neon Cloud (dev instance)
 
 ### Docker Compose (docker-compose.dev.yaml)
 Defined in [compose.dev.yaml](compose.dev.yaml):
-- `NEXT_PUBLIC_FRONTEND_API=http://backend-ml:8000`
+- `NEXT_PUBLIC_ML_API_URL=http://backend-ml:8000`
 - `NEXT_TELEMETRY_DISABLED=1`
 
 ### Vercel Production
 ```
 Frontend:  https://curasense-frontend.vercel.app
 Database:  Neon DB (production)
-ML APIs:   External deployment (Render/Railway)
+ML APIs:   Azure Container Apps
 ```
 
 **Vercel Environment Variables** (via Dashboard):
 - `DATABASE_URL` (production pooled connection)
 - `JWT_SECRET` (production secret)
 - `JWT_REFRESH_SECRET` (production secret)
-- `NEXT_PUBLIC_ML_API_URL` (external deployment URL)
-- `NEXT_PUBLIC_VISION_API_URL` (external deployment URL)
+- `BACKEND_API_URL` (Azure ML API URL)
+- `NEXT_PUBLIC_ML_API_URL` (Azure ML API URL)
+- `NEXT_PUBLIC_VISION_API_URL` (Azure Vision API URL)
 
 ---
 
