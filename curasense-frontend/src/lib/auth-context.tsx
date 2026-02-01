@@ -20,7 +20,6 @@ export interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  isGuest: boolean;
   isLoading: boolean;
   accessToken: string | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
@@ -31,8 +30,6 @@ interface AuthContextType {
   refreshToken: () => Promise<boolean>;
   refreshUser: () => Promise<void>;
   updateProfile: (data: Partial<User>) => Promise<{ success: boolean; error?: string }>;
-  continueAsGuest: () => void;
-  exitGuestMode: () => void;
 }
 
 interface RegisterData {
@@ -55,7 +52,6 @@ interface AuthState {
 // ============================================
 
 const AUTH_STORAGE_KEY = "curasense_auth";
-const GUEST_STORAGE_KEY = "curasense_guest";
 const TOKEN_REFRESH_THRESHOLD = 5 * 60 * 1000; // 5 minutes before expiry
 
 // ============================================
@@ -75,33 +71,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     expiresAt: null,
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [isGuest, setIsGuest] = useState(false);
 
-  // Guest mode functions
-  const continueAsGuest = useCallback(() => {
-    setIsGuest(true);
-    if (typeof window !== "undefined") {
-      localStorage.setItem(GUEST_STORAGE_KEY, "true");
-    }
-  }, []);
-
-  const exitGuestMode = useCallback(() => {
-    setIsGuest(false);
-    if (typeof window !== "undefined") {
-      localStorage.removeItem(GUEST_STORAGE_KEY);
-    }
-  }, []);
-
-  // Check for guest mode on mount - AUTO-ENABLE for MVP
+  // MVP Mode: All users are automatically authenticated with full access
   useEffect(() => {
     if (typeof window !== "undefined") {
-      // MVP Mode: Auto-enable guest mode for all users
-      // This bypasses login requirement while keeping auth context functional
-      const guestMode = localStorage.getItem(GUEST_STORAGE_KEY);
-      if (guestMode !== "true") {
-        localStorage.setItem(GUEST_STORAGE_KEY, "true");
-      }
-      setIsGuest(true);
+      // Set loading to false immediately - all features are available
       setIsLoading(false);
     }
   }, []);
@@ -439,8 +413,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user: authState.user,
-        isAuthenticated: !!authState.user,
-        isGuest,
+        isAuthenticated: true, // MVP: Always authenticated - full access for everyone
         isLoading,
         accessToken: authState.accessToken,
         login,
@@ -451,8 +424,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         refreshToken,
         refreshUser,
         updateProfile,
-        continueAsGuest,
-        exitGuestMode,
       }}
     >
       {children}

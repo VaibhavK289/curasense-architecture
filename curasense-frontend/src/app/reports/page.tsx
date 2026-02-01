@@ -92,7 +92,7 @@ const statusColors: Record<Report["status"], string> = {
 };
 
 export default function ReportsPage() {
-  const { isAuthenticated, isGuest } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [reports, setReports] = useState<Report[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
@@ -114,7 +114,7 @@ export default function ReportsPage() {
     return matchesSearch && matchesType;
   });
 
-  if (!isAuthenticated && !isGuest) {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <Card className="p-8 text-center max-w-md">
@@ -273,26 +273,6 @@ export default function ReportsPage() {
               </Card>
             </motion.div>
           ))}
-        </motion.div>
-      )}
-
-      {/* Guest Mode Notice */}
-      {isGuest && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mt-8"
-        >
-          <Card className="p-4 bg-[hsl(var(--brand-primary)/0.05)] border-[hsl(var(--brand-primary)/0.2)]">
-            <p className="text-sm text-center text-[hsl(var(--muted-foreground))]">
-              You&apos;re viewing sample data in guest mode.{" "}
-              <a href="/register" className="text-[hsl(var(--brand-primary))] hover:underline">
-                Create an account
-              </a>{" "}
-              to save your medical reports securely.
-            </p>
-          </Card>
         </motion.div>
       )}
     </div>

@@ -285,9 +285,7 @@ function DemoPreview() {
 // ============================================
 // AUTHENTICATED DASHBOARD
 // ============================================
-function AuthenticatedDashboard({ userName, isGuest = false }: { userName?: string; isGuest?: boolean }) {
-  const { exitGuestMode } = useAuth();
-  
+function AuthenticatedDashboard({ userName }: { userName?: string }) {
   const greeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "Good morning";
@@ -315,34 +313,6 @@ function AuthenticatedDashboard({ userName, isGuest = false }: { userName?: stri
       </div>
 
       <div className="relative space-y-8">
-        {/* Guest Banner */}
-        {isGuest && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center">
-                <UserCircle2 className="w-5 h-5 text-amber-500" />
-              </div>
-              <div>
-                <p className="font-medium text-[hsl(var(--foreground))]">Guest Mode</p>
-                <p className="text-sm text-[hsl(var(--muted-foreground))]">Create an account to save your analysis history</p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Link href="/register">
-                <Button size="sm" className="gap-2">
-                  <Sparkles className="w-4 h-4" />
-                  Create Account
-                </Button>
-              </Link>
-              <Button size="sm" variant="ghost" onClick={exitGuestMode}>Exit</Button>
-            </div>
-          </motion.div>
-        )}
-
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
           <motion.div
@@ -356,7 +326,7 @@ function AuthenticatedDashboard({ userName, isGuest = false }: { userName?: stri
             <h1 className="text-3xl sm:text-4xl font-bold text-[hsl(var(--foreground))]">
               {greeting()},{" "}
               <span className="bg-gradient-to-r from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-secondary))] bg-clip-text text-transparent">
-                {isGuest ? "Guest" : (userName?.split(" ")[0] || "there")}
+                {userName?.split(" ")[0] || "there"}
               </span>
             </h1>
             <p className="text-[hsl(var(--muted-foreground))] mt-2 max-w-lg">
@@ -551,7 +521,7 @@ function AuthenticatedDashboard({ userName, isGuest = false }: { userName?: stri
 // MAIN LANDING PAGE
 // ============================================
 export default function HomePage() {
-  const { isAuthenticated, user, isGuest } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const heroRef = useRef<HTMLDivElement>(null);
   const [isHeroMounted, setIsHeroMounted] = useState(false);
   
@@ -569,9 +539,9 @@ export default function HomePage() {
   const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
   const heroY = useTransform(scrollYProgress, [0, 0.5], [0, 100]);
 
-  // Show dashboard for authenticated users OR guests
-  if (isAuthenticated || isGuest) {
-    return <AuthenticatedDashboard userName={user?.displayName || user?.firstName} isGuest={isGuest} />;
+  // Show dashboard for all users - full access without login
+  if (isAuthenticated) {
+    return <AuthenticatedDashboard userName={user?.displayName || user?.firstName} />;
   }
 
   return (
