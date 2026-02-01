@@ -100,6 +100,17 @@ model.save_pretrained('/opt/ml-models/transformers/all-MiniLM-L6-v2'); \
 tokenizer.save_pretrained('/opt/ml-models/transformers/all-MiniLM-L6-v2'); \
 print('MiniLM model cached successfully')" || echo "MiniLM optional - continuing..."
 
+# Pre-download Medical-NER model (required for prescription analysis)
+RUN --mount=type=cache,target=/root/.cache/huggingface \
+    python -c "\
+from transformers import AutoTokenizer, AutoModelForTokenClassification; \
+print('Downloading Medical-NER model...'); \
+model = AutoModelForTokenClassification.from_pretrained('Clinical-AI-Apollo/Medical-NER'); \
+tokenizer = AutoTokenizer.from_pretrained('Clinical-AI-Apollo/Medical-NER'); \
+model.save_pretrained('/opt/ml-models/transformers/Medical-NER'); \
+tokenizer.save_pretrained('/opt/ml-models/transformers/Medical-NER'); \
+print('Medical-NER model cached successfully')"
+
 # ============================================
 # STAGE 6: Application dependencies (changes often)
 # ============================================

@@ -1,9 +1,14 @@
 from transformers import AutoTokenizer, AutoModelForTokenClassification
 import torch
+import os
 
+# Use locally cached model if available (from Docker build), otherwise download from HuggingFace
+MODEL_PATH = "/opt/ml-models/transformers/Medical-NER"
+if not os.path.exists(MODEL_PATH):
+    MODEL_PATH = "Clinical-AI-Apollo/Medical-NER"
 
-tokenizer = AutoTokenizer.from_pretrained("Clinical-AI-Apollo/Medical-NER")
-model = AutoModelForTokenClassification.from_pretrained("Clinical-AI-Apollo/Medical-NER")
+tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
+model = AutoModelForTokenClassification.from_pretrained(MODEL_PATH)
 
 
 def process_ner_output(text: str, max_length: int = 512) -> list:
