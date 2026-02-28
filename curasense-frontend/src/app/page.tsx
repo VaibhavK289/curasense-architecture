@@ -548,24 +548,24 @@ function AuthenticatedDashboard({ userName, isGuest = false }: { userName?: stri
 }
 
 // ============================================
-// MAIN LANDING PAGE
+// LANDING PAGE CONTENT (for non-authenticated users)
 // ============================================
-export default function HomePage() {
-  const { isAuthenticated, user, isGuest } = useAuth();
+function LandingPageContent() {
   const heroRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  
   const { scrollYProgress } = useScroll({
-    target: heroRef,
+    target: isMounted ? heroRef : undefined,
     offset: ["start start", "end start"],
   });
   
   const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
   const heroY = useTransform(scrollYProgress, [0, 0.5], [0, 100]);
-
-  // Show dashboard for authenticated users OR guests
-  if (isAuthenticated || isGuest) {
-    return <AuthenticatedDashboard userName={user?.displayName || user?.firstName} isGuest={isGuest} />;
-  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[hsl(var(--background))]">
@@ -1075,4 +1075,18 @@ export default function HomePage() {
       <div className="h-20" />
     </div>
   );
+}
+
+// ============================================
+// MAIN LANDING PAGE
+// ============================================
+export default function HomePage() {
+  const { isAuthenticated, user, isGuest } = useAuth();
+
+  // Show dashboard for authenticated users OR guests
+  if (isAuthenticated || isGuest) {
+    return <AuthenticatedDashboard userName={user?.displayName || user?.firstName} isGuest={isGuest} />;
+  }
+
+  return <LandingPageContent />;
 }

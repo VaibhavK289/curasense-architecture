@@ -68,7 +68,7 @@ function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const { resetPassword } = useAuth();
   
-  const token = searchParams.get("token");
+  const token = searchParams?.get("token");
   
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

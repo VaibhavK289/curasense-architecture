@@ -304,8 +304,8 @@ export function MobileNav() {
         <div className="bg-[hsl(var(--card)/0.98)] border-t border-[hsl(var(--border))] backdrop-blur-xl pb-safe">
           <div className="flex items-center justify-around px-2 py-2">
             {tabBarItems.map((item) => {
-              const isActive = pathname === item.href || 
-                (item.href !== "/" && pathname.startsWith(item.href));
+              const isActive = pathname === item.href ||
+                (item.href !== "/" && pathname?.startsWith(item.href));
               
               return (
                 <Link
