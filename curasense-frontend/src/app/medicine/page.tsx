@@ -29,6 +29,8 @@ import { GradientText, SpotlightCard, AnimatedContainer, StaggerContainer, Stagg
 import { cn } from "@/lib/utils";
 import { compareMedicines } from "@/lib/api";
 import { springPresets } from "@/styles/tokens/animations";
+import { saveReport } from "@/lib/save-report";
+import { useAuth } from "@/lib/auth-context";
 
 interface MedicineInfo {
   name: string;
@@ -52,6 +54,7 @@ export default function MedicinePage() {
   const [medicines, setMedicines] = useState<string[]>([""]);
   const [isComparing, setIsComparing] = useState(false);
   const [comparisonResults, setComparisonResults] = useState<MedicineInfo[]>([]);
+  const { accessToken } = useAuth();
 
   const addMedicine = () => {
     if (medicines.length < 4) {
@@ -86,6 +89,15 @@ export default function MedicinePage() {
       
       const response = await compareMedicines(validMedicines);
       setComparisonResults(response.comparison as unknown as MedicineInfo[]);
+
+      // Save comparison to store + DB
+      saveReport({
+        type: "medicine",
+        title: `Medicine Comparison: ${validMedicines.join(" vs ")}`,
+        summary: `Compared ${validMedicines.length} medicines: ${validMedicines.join(", ")}`,
+        content: JSON.stringify(response.comparison),
+        status: "completed",
+      }, accessToken);
       
       toast.success("Comparison complete!", { id: "compare" });
     } catch {

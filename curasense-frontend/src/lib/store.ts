@@ -123,6 +123,13 @@ export const useAppStore = create<AppState>()(
         const reports = get().reports;
         const completedReports = reports.filter(r => r.status === "completed");
         
+        // Safe date parser — handles strings, Date objects, and invalid values
+        const safeDate = (v: unknown): Date | null => {
+          if (!v) return null;
+          const d = new Date(v as string | number | Date);
+          return isNaN(d.getTime()) ? null : d;
+        };
+
         // Reports by type
         const reportsByType: Record<string, number> = {};
         reports.forEach(r => {
@@ -160,9 +167,10 @@ export const useAppStore = create<AppState>()(
         
         const dailyUsage = last30Days.map(date => ({
           date,
-          count: reports.filter(r => 
-            new Date(r.createdAt).toISOString().split("T")[0] === date
-          ).length,
+          count: reports.filter(r => {
+            const d = safeDate(r.createdAt);
+            return d ? d.toISOString().split("T")[0] === date : false;
+          }).length,
         }));
 
         // Accuracy metrics from confidence scores
