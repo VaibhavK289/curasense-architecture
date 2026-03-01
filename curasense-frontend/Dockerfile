@@ -61,7 +61,11 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Copy timeout patch for long-running ML API calls
+COPY --chown=nextjs:nodejs timeout-patch.js ./timeout-patch.js
+
 USER nextjs
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+# Use --require to patch HTTP timeout before Next.js server starts
+CMD ["node", "--require", "./timeout-patch.js", "server.js"]

@@ -10,7 +10,17 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "10mb",
     },
+    // Increase proxy timeout for long-running ML backend calls (10 minutes)
+    proxyTimeout: 600000,
   },
+
+  // Increase Node.js HTTP agent keep-alive timeout
+  httpAgentOptions: {
+    keepAlive: true,
+  },
+
+  // Increase server external timeout for API routes
+  serverExternalPackages: [],
   
   // Image optimization
   images: {
