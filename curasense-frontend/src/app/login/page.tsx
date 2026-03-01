@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { GradientText, FloatingOrb } from "@/components/ui/aceternity";
+import { CuraSenseLogo } from "@/components/ui/logo";
 import { springPresets } from "@/styles/tokens/animations";
 import { useAuth } from "@/lib/auth-context";
 
@@ -81,10 +82,7 @@ export default function LoginPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-secondary))] mx-auto mb-4">
-              <svg viewBox="0 0 32 32" fill="none" className="h-7 w-7" xmlns="http://www.w3.org/2000/svg">
-                <path d="M16 2L4 7v8c0 7.18 5.12 13.89 12 15.5 6.88-1.61 12-8.32 12-15.5V7L16 2z" fill="rgba(255,255,255,0.15)" stroke="white" strokeWidth="1.5"/>
-                <path d="M14 10h4v4h4v4h-4v4h-4v-4h-4v-4h4v-4z" fill="white" opacity="0.95"/>
-              </svg>
+              <CuraSenseLogo className="h-7 w-7" />
             </div>
             <h1 className="text-2xl font-bold text-[hsl(var(--foreground))]">
               Welcome back

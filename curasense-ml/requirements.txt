@@ -1,6 +1,6 @@
 transformers
 ipykernel
-torch
+torch==2.6.0
 crewai
 crewai-tools
 langchain
@@ -14,7 +14,7 @@ uvicorn
 python-multipart
 PyPDF2
 pdfplumber
-bitsandbytes
+bitsandbytes==0.45.5
 accelerate
 
 huggingface_hub

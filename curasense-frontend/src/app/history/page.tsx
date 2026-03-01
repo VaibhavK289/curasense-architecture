@@ -26,8 +26,11 @@ import {
   Sparkles,
   Archive,
   RefreshCw,
+  X,
+  ArrowLeft,
 } from "lucide-react";
 import { useAppStore, Report } from "@/lib/store";
+import { ReportViewer } from "@/components/report-viewer";
 import { cn } from "@/lib/utils";
 import { springPresets } from "@/styles/tokens/animations";
 import { toast } from "sonner";
@@ -557,6 +560,7 @@ export default function HistoryPage() {
   const [filterType, setFilterType] = useState<FilterType>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
+  const [viewingReport, setViewingReport] = useState<Report | null>(null);
 
   const hasFilters = searchQuery.trim() !== "" || filterType !== "all" || statusFilter !== "all";
 
@@ -599,16 +603,9 @@ export default function HistoryPage() {
 
   const handleViewReport = useCallback(
     (report: Report) => {
-      setCurrentReport(report);
-      const routes: Record<string, string> = {
-        prescription: "/diagnosis/prescription",
-        text: "/diagnosis/prescription",
-        xray: "/diagnosis/xray",
-        medicine: "/medicine",
-      };
-      router.push(routes[report.type] || "/");
+      setViewingReport(report);
     },
-    [router, setCurrentReport],
+    [],
   );
 
   const handleDeleteReport = useCallback(
@@ -714,6 +711,112 @@ export default function HistoryPage() {
             </AnimatePresence>
           </div>
         )}
+
+        {/* ── Report Viewer Overlay ── */}
+        <AnimatePresence>
+          {viewingReport && (
+            <motion.div
+              key="report-overlay"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 backdrop-blur-sm p-4 sm:p-8"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) setViewingReport(null);
+              }}
+            >
+              <motion.div
+                initial={{ opacity: 0, y: 30, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.97 }}
+                transition={springPresets.smooth}
+                className="relative w-full max-w-4xl my-4"
+              >
+                {/* Floating header bar */}
+                <div className="flex items-center justify-between mb-4 px-1">
+                  <motion.button
+                    onClick={() => setViewingReport(null)}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[hsl(var(--card))] border border-[hsl(var(--border))] text-sm font-medium text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted)/0.5)] transition-colors shadow-lg"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to History
+                  </motion.button>
+
+                  <div className="flex items-center gap-2">
+                    {(() => {
+                      const cfg = TYPE_CONFIG[viewingReport.type] || TYPE_CONFIG.text;
+                      return (
+                        <span
+                          className={cn(
+                            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border shadow-sm",
+                            cfg.bg,
+                            cfg.border,
+                          )}
+                          style={{ color: cfg.color }}
+                        >
+                          <cfg.icon className="h-3.5 w-3.5" />
+                          {cfg.label}
+                        </span>
+                      );
+                    })()}
+                    <motion.button
+                      onClick={() => setViewingReport(null)}
+                      whileTap={{ scale: 0.9 }}
+                      className="p-2 rounded-xl bg-[hsl(var(--card))] border border-[hsl(var(--border))] text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted)/0.5)] transition-colors shadow-lg"
+                    >
+                      <X className="h-4 w-4" />
+                    </motion.button>
+                  </div>
+                </div>
+
+                {/* Report viewer card */}
+                <ReportViewer
+                  content={viewingReport.content}
+                  title={viewingReport.title}
+                  type={
+                    viewingReport.type === "text"
+                      ? "prescription"
+                      : (viewingReport.type as "prescription" | "xray" | "medicine")
+                  }
+                  reportId={viewingReport.id}
+                />
+
+                {/* Report metadata footer */}
+                <div className="mt-4 flex flex-wrap items-center gap-3 px-1">
+                  {viewingReport.processingTimeMs && (
+                    <span className="flex items-center gap-1.5 text-xs text-[hsl(var(--muted-foreground))] bg-[hsl(var(--card))] border border-[hsl(var(--border))] px-3 py-1.5 rounded-lg shadow-sm">
+                      <Zap className="h-3.5 w-3.5 text-[hsl(var(--color-info))]" />
+                      Processed in {(viewingReport.processingTimeMs / 1000).toFixed(1)}s
+                    </span>
+                  )}
+                  {viewingReport.confidenceScore && (
+                    <span className="flex items-center gap-1.5 text-xs text-[hsl(var(--muted-foreground))] bg-[hsl(var(--card))] border border-[hsl(var(--border))] px-3 py-1.5 rounded-lg shadow-sm">
+                      <Shield className="h-3.5 w-3.5 text-[hsl(var(--brand-secondary))]" />
+                      {Math.round(viewingReport.confidenceScore * 100)}% confidence
+                    </span>
+                  )}
+                  {viewingReport.findings && viewingReport.findings.length > 0 && (
+                    <span className="flex items-center gap-1.5 text-xs text-[hsl(var(--muted-foreground))] bg-[hsl(var(--card))] border border-[hsl(var(--border))] px-3 py-1.5 rounded-lg shadow-sm">
+                      <Sparkles className="h-3.5 w-3.5 text-[hsl(var(--color-success))]" />
+                      {viewingReport.findings.length} findings
+                    </span>
+                  )}
+                  <span className="flex items-center gap-1.5 text-xs text-[hsl(var(--muted-foreground))] bg-[hsl(var(--card))] border border-[hsl(var(--border))] px-3 py-1.5 rounded-lg shadow-sm">
+                    <Calendar className="h-3.5 w-3.5" />
+                    {(() => {
+                      const d = new Date(viewingReport.createdAt as string | number | Date);
+                      return isNaN(d.getTime())
+                        ? "Unknown date"
+                        : d.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+                    })()}
+                  </span>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

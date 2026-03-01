@@ -11,6 +11,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
+# Upgrade pip to avoid hash mismatch issues with newer packages
+RUN pip install --upgrade pip
+
 COPY requirements.txt .
 # Increase timeout and use no-cache to ensure a clean install
 RUN pip install --no-cache-dir --timeout=2000 -r requirements.txt

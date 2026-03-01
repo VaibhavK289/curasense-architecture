@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GradientText, PulsingDot } from "@/components/ui/aceternity";
+import { CuraSenseLogo } from "@/components/ui/logo";
 import { springPresets } from "@/styles/tokens/animations";
 import { useAuth } from "@/lib/auth-context";
 
@@ -158,11 +159,7 @@ export function Sidebar() {
           whileHover={{ scale: 1.05 }}
           className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[hsl(var(--brand-primary))] via-[hsl(168_84%_38%)] to-[hsl(var(--brand-secondary))] shadow-lg shadow-[hsl(var(--brand-primary)/0.35)]"
         >
-          <svg viewBox="0 0 32 32" fill="none" className="h-6 w-6" xmlns="http://www.w3.org/2000/svg">
-            <path d="M16 2L4 7v8c0 7.18 5.12 13.89 12 15.5 6.88-1.61 12-8.32 12-15.5V7L16 2z" fill="rgba(255,255,255,0.15)" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M14 10h4v4h4v4h-4v4h-4v-4h-4v-4h4v-4z" fill="white" opacity="0.95"/>
-            <path d="M8 16h3l1.5-3 2 6 2-6 1.5 3h6" stroke="hsl(168, 84%, 40%)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-          </svg>
+          <CuraSenseLogo className="h-6 w-6" />
           {/* Subtle glow ring */}
           <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[hsl(var(--brand-primary)/0.4)] to-transparent blur-md -z-10" />
         </motion.div>
@@ -249,11 +246,7 @@ export function Sidebar() {
                   transition={{ duration: 0.4 }}
                   className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[hsl(var(--brand-primary))] via-[hsl(168_84%_38%)] to-[hsl(var(--brand-secondary))] shadow-lg shadow-[hsl(var(--brand-primary)/0.35)]"
                 >
-                  <svg viewBox="0 0 32 32" fill="none" className="h-6 w-6" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M16 2L4 7v8c0 7.18 5.12 13.89 12 15.5 6.88-1.61 12-8.32 12-15.5V7L16 2z" fill="rgba(255,255,255,0.15)" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M14 10h4v4h4v4h-4v4h-4v-4h-4v-4h4v-4z" fill="white" opacity="0.95"/>
-                    <path d="M8 16h3l1.5-3 2 6 2-6 1.5 3h6" stroke="hsl(168, 84%, 40%)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-                  </svg>
+                  <CuraSenseLogo className="h-6 w-6" />
                 </motion.div>
                 <div>
                   <h1 className="text-xl font-bold">

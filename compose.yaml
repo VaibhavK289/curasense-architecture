@@ -8,9 +8,11 @@ services:
       - "3000:3000"
     env_file: ./curasense-frontend/.env.local
     environment:
-      - NEXT_PUBLIC_FRONTEND_API=http://backend-ml:8000
-      - NEXT_PUBLIC_ML_API=http://backend-vision:8001
+      # Internal Docker network URLs (server-side calls)
       - BACKEND_API_URL=http://backend-ml:8000
+      # Public URLs (client-side browser calls go to localhost)
+      - NEXT_PUBLIC_ML_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_VISION_API_URL=http://localhost:8001
     depends_on:
       - backend-ml
       - backend-vision
@@ -24,8 +26,9 @@ services:
     ports:
       - "8000:8000"
     env_file: ./curasense-ml/.env
+    environment:
+      - ALLOWED_ORIGINS=http://localhost:3000,http://frontend:3000
     restart: always
-    # Run command derived from your repo instructions
     command: uvicorn app:app --host 0.0.0.0 --port 8000
 
   # Vision/FastAPI Backend (RAG / Vision Analysis)
@@ -36,8 +39,9 @@ services:
     ports:
       - "8001:8001"
     env_file: ./ml-fastapi/.env
+    environment:
+      - ALLOWED_ORIGINS=http://localhost:3000,http://frontend:3000
     restart: always
-    # Run command derived from your repo instructions
     command: uvicorn main:app --host 0.0.0.0 --port 8001
 
 networks:
