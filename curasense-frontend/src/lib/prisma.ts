@@ -4,6 +4,7 @@ import { Pool } from "pg";
 
 // PrismaClient singleton pattern for Next.js
 // Prevents multiple instances in development due to hot reloading
+// Uses lazy initialization to avoid build-time DATABASE_URL requirement
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -35,10 +36,21 @@ function createPrismaClient(): PrismaClient {
   });
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
+// Lazy getter: PrismaClient is only created on first access (at runtime),
+// not at module load time (which happens during `next build`).
+function getPrismaClient(): PrismaClient {
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = createPrismaClient();
+  }
+  return globalForPrisma.prisma;
 }
+
+// Use a Proxy so that `prisma.someMethod()` triggers lazy initialization
+// while keeping the same import API: `import { prisma } from "@/lib/prisma"`
+export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    return Reflect.get(getPrismaClient(), prop);
+  },
+});
 
 export default prisma;

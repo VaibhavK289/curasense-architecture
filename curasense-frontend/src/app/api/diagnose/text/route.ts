@@ -3,20 +3,17 @@ import { NextRequest, NextResponse } from "next/server";
 // Backend URL - server-side only (not NEXT_PUBLIC_)
 const BACKEND_URL = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_FRONTEND_API || "http://localhost:8000";
 
-// Increase timeout to 10 minutes for ML model loading (Vercel only, standalone uses node timeout)
-export const maxDuration = 600;
-
-// Force Node.js runtime (not Edge) so we get full timeout control
-export const runtime = "nodejs";
+// Max duration for serverless platforms (300s for Docker/Azure, 60s on Vercel hobby)
+export const maxDuration = 300;
 
 export async function POST(request: NextRequest) {
   try {
     // Get the JSON body from the request
     const body = await request.json();
     
-    // Create AbortController with 10 minute timeout for long-running ML pipeline
+    // Create AbortController with 300 second timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 minutes
+    const timeoutId = setTimeout(() => controller.abort(), 300000); // 300 seconds
     
     // Forward the request to the backend with extended timeout
     const response = await fetch(`${BACKEND_URL}/diagnose/text/`, {
@@ -37,23 +34,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
     console.error("Error proxying text diagnosis request:", error);
-    
-    // Provide more specific error messages
-    let errorMessage = "Failed to analyze text";
-    if (error instanceof Error) {
-      if (error.name === "AbortError") {
-        errorMessage = "Analysis timed out. The ML pipeline is taking longer than expected. Please try again.";
-      } else {
-        errorMessage = error.message;
-      }
-    }
-    
     return NextResponse.json(
       { 
         status: "error", 
-        error: errorMessage 
+        error: error instanceof Error ? error.message : "Failed to analyze text" 
       },
-      { status: error instanceof Error && error.name === "AbortError" ? 504 : 500 }
+      { status: 500 }
     );
   }
 }

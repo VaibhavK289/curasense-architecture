@@ -14,7 +14,6 @@ build/
 .env
 .env.local
 .env.*.local
-.env.azure
 .venv/
 venv/
 
@@ -35,6 +34,9 @@ Thumbs.db
 
 # ChromaDB local storage
 .chroma/
+
+# Azure deployment credentials
+.azure-credentials
 
 # Misc
 nul

@@ -13,10 +13,7 @@ llm = LLM(
     model="gemini/gemini-2.5-flash",
 )
 
-files = {
-    "agents" : "crew/config/agents.yaml",
-    "tasks" :  "crew/config/tasks.yaml"
-    }
+files = {"agents": "crew/config/agents.yaml", "tasks": "crew/config/tasks.yaml"}
 
 ## Load configurations from YAML files
 
@@ -39,15 +36,9 @@ report_writing_task_config = configs["tasks"]["report_writing_task"]
 
 
 ## Agents
-ner_validation_agent = Agent(
-    config = ner_validaton_agent_config,
-    llm=llm
-)
+ner_validation_agent = Agent(config=ner_validaton_agent_config, llm=llm)
 
-preliminary_diagnosis_agent = Agent(
-    config = preliminary_diagnosis_agent_config,
-    llm=llm
-)
+preliminary_diagnosis_agent = Agent(config=preliminary_diagnosis_agent_config, llm=llm)
 
 report_writer_agent = Agent(
     config=report_writer_agent_config,
@@ -55,42 +46,51 @@ report_writer_agent = Agent(
 )
 
 
-
 ## Tasks
 ner_validation_task = Task(
-    config = ner_validaton_task_config,
-    agent = ner_validation_agent,
-    output_pydantic= NERValidationOutput
+    config=ner_validaton_task_config,
+    agent=ner_validation_agent,
+    output_pydantic=NERValidationOutput,
 )
 
 preliminary_diagnosis_task = Task(
-    config = preliminary_diagnose_task_config,
-    agent = preliminary_diagnosis_agent,
-    output_pydantic= PreliminaryDiagnosisListOutput,
+    config=preliminary_diagnose_task_config,
+    agent=preliminary_diagnosis_agent,
+    output_pydantic=PreliminaryDiagnosisListOutput,
 )
 
 report_writing_task = Task(
     config=report_writing_task_config,
     agent=report_writer_agent,
-    output_file="report.md"
+    # NOTE: output_file removed to fix race condition — concurrent requests
+    # were overwriting each other's report.md. The report content is now
+    # returned in-memory via crew.kickoff() result instead.
 )
 
 ## Crew
 
 ner_validation_crew = Crew(
-    agents=[ner_validation_agent, ],
-    tasks=[ner_validation_task, ],
-    verbose=True
+    agents=[
+        ner_validation_agent,
+    ],
+    tasks=[
+        ner_validation_task,
+    ],
+    verbose=True,
 )
 
 prelim_diag_crew = Crew(
     agents=[preliminary_diagnosis_agent],
     tasks=[preliminary_diagnosis_task],
-    verbose=True
+    verbose=True,
 )
 
 report_writing_crew = Crew(
-    agents=[report_writer_agent,],
-    tasks=[report_writing_task,],
-    verbose=True
+    agents=[
+        report_writer_agent,
+    ],
+    tasks=[
+        report_writing_task,
+    ],
+    verbose=True,
 )

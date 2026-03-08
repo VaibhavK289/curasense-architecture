@@ -1,20 +1,20 @@
-FROM python:3.10-slim
-
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install dependencies for ChromaDB/Vector storage
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
-
+# Install Python dependencies (no PyTorch needed — all inference is API-based)
 COPY requirements.txt .
-# Increase timeout and use no-cache to ensure a clean install
-RUN pip install --no-cache-dir --timeout=2000 -r requirements.txt
+RUN pip install --no-cache-dir --timeout=300 -r requirements.txt
 
+# Copy application code
 COPY . .
 
+# Create writable directories for ChromaDB and temp files
+RUN mkdir -p /app/.chroma /app/logs
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8001/ping')" || exit 1
+
 EXPOSE 8001
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]

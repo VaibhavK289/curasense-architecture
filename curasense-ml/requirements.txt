@@ -1,5 +1,4 @@
 transformers
-ipykernel
 torch
 crewai
 crewai-tools
@@ -14,7 +13,6 @@ uvicorn
 python-multipart
 PyPDF2
 pdfplumber
-bitsandbytes
 accelerate
-
+pyyaml
 huggingface_hub

@@ -59,6 +59,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { springPresets } from "@/styles/tokens/animations";
+import { GradientText } from "@/components/ui/aceternity";
 
 // ============================================
 // TYPES
@@ -126,28 +127,28 @@ function QuickActions() {
       label: "New Prescription",
       icon: FileText,
       href: "/diagnosis/prescription",
-      color: "from-blue-500 to-cyan-500",
+      color: "from-[hsl(var(--color-diagnosis))] to-[hsl(var(--accent-cyan))]",
       description: "Upload & analyze",
     },
     {
       label: "X-Ray Analysis",
       icon: ImageIcon,
       href: "/diagnosis/xray",
-      color: "from-purple-500 to-pink-500",
+      color: "from-[hsl(var(--brand-secondary))] to-[hsl(var(--accent-rose))]",
       description: "AI-powered imaging",
     },
     {
       label: "Medicine Lookup",
       icon: Pill,
       href: "/medicine",
-      color: "from-emerald-500 to-teal-500",
+      color: "from-[hsl(var(--color-medicine))] to-[hsl(var(--brand-primary))]",
       description: "Drug information",
     },
     {
       label: "View Analytics",
       icon: BarChart3,
       href: "/analytics",
-      color: "from-orange-500 to-amber-500",
+      color: "from-[hsl(var(--color-warning))] to-[hsl(var(--accent-amber))]",
       description: "Usage statistics",
     },
   ];
@@ -236,29 +237,29 @@ function SummaryStatistics() {
       label: "Total Reports",
       value: stats.totalReports,
       icon: FileText,
-      color: "text-blue-500",
-      bg: "bg-blue-500/10",
+      color: "text-[hsl(var(--color-info))]",
+      bg: "bg-[hsl(var(--color-info)/0.1)]",
     },
     {
       label: "Completed",
       value: stats.completedReports,
       icon: CheckCircle,
-      color: "text-emerald-500",
-      bg: "bg-emerald-500/10",
+      color: "text-[hsl(var(--color-success))]",
+      bg: "bg-[hsl(var(--color-success)/0.1)]",
     },
     {
       label: "This Week",
       value: stats.thisWeekReports,
       icon: TrendingUp,
-      color: "text-purple-500",
-      bg: "bg-purple-500/10",
+      color: "text-[hsl(var(--brand-secondary))]",
+      bg: "bg-[hsl(var(--brand-secondary)/0.1)]",
     },
     {
       label: "Avg Confidence",
       value: `${stats.avgConfidence.toFixed(0)}%`,
       icon: Activity,
-      color: "text-amber-500",
-      bg: "bg-amber-500/10",
+      color: "text-[hsl(var(--color-warning))]",
+      bg: "bg-[hsl(var(--color-warning)/0.1)]",
     },
   ];
 
@@ -875,7 +876,12 @@ export default function ProfilePage() {
   const router = useRouter();
 
   return (
-    <div className="container max-w-6xl mx-auto py-6 px-4 sm:px-6">
+    <div className="min-h-screen bg-[hsl(var(--background))] relative overflow-hidden">
+      {/* Decorative background shapes */}
+      <div className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-[hsl(var(--brand-primary)/0.06)] blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-[hsl(var(--brand-secondary)/0.06)] blur-3xl" />
+
+    <div className="container max-w-6xl mx-auto py-6 px-4 sm:px-6 relative z-10">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -884,16 +890,18 @@ export default function ProfilePage() {
         className="mb-8"
       >
         <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 rounded-lg bg-[hsl(var(--brand-primary)/0.1)]">
-            <User className="h-6 w-6 text-[hsl(var(--brand-primary))]" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-secondary))] shadow-lg shadow-[hsl(var(--brand-primary)/0.3)]">
+            <User className="h-6 w-6 text-white" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[hsl(var(--foreground))]">
-            My Profile
-          </h1>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold">
+              <GradientText>My Profile</GradientText>
+            </h1>
+            <p className="text-[hsl(var(--muted-foreground))]">
+              Manage your account settings and view your activity
+            </p>
+          </div>
         </div>
-        <p className="text-[hsl(var(--muted-foreground))]">
-          Manage your account settings and view your activity
-        </p>
       </motion.div>
 
       {/* Main Grid */}
@@ -940,6 +948,7 @@ export default function ProfilePage() {
           </Card>
         </div>
       </div>
+    </div>
     </div>
   );
 }
