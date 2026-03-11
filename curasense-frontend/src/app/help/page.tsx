@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { HelpCircle, Book, MessageCircle, Mail, ExternalLink } from "lucide-react";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -75,9 +76,11 @@ export default function HelpPage() {
             <p className="text-sm text-[hsl(var(--muted-foreground))] mb-4">
               Learn how to use all CuraSense features
             </p>
-            <Button variant="outline" className="gap-2">
-              Read Docs <ExternalLink className="h-4 w-4" />
-            </Button>
+            <Link href="/help/docs">
+              <Button variant="outline" className="gap-2">
+                Read Docs <ExternalLink className="h-4 w-4" />
+              </Button>
+            </Link>
           </SpotlightCard>
 
           <SpotlightCard className="p-6 text-center">
