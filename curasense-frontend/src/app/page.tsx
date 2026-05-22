@@ -8,7 +8,8 @@
 
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useRef, useState, useEffect, useMemo } from "react";
 import {
   Stethoscope,
   FileText,
@@ -30,6 +31,7 @@ import {
   UserCircle2,
   ArrowUpRight,
   Calendar,
+  Clock,
   Play,
   Star,
   Quote,
@@ -44,6 +46,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
+import { useAppStore, Report } from "@/lib/store";
 import {
   GlassCard,
   SpotlightCardV2,
@@ -420,33 +423,73 @@ function AuthenticatedDashboard({ userName }: { userName?: string }) {
               </Link>
             </div>
 
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[hsl(var(--muted))] to-[hsl(var(--muted)/0.5)] flex items-center justify-center mb-4"
-              >
-                <FileText className="w-10 h-10 text-[hsl(var(--muted-foreground)/0.5)]" />
-              </motion.div>
-              <h3 className="text-lg font-medium text-[hsl(var(--foreground))] mb-2">No analysis yet</h3>
-              <p className="text-[hsl(var(--muted-foreground))] mb-6 max-w-sm">
-                Upload a prescription or medical image to get started with AI-powered analysis.
-              </p>
-              <div className="flex gap-3">
-                <Link href="/diagnosis/prescription">
-                  <Button className="gap-2">
-                    <FileText className="w-4 h-4" />
-                    Analyze Prescription
-                  </Button>
-                </Link>
-                <Link href="/diagnosis/xray">
-                  <Button variant="outline" className="gap-2">
-                    <ScanLine className="w-4 h-4" />
-                    Analyze X-Ray
-                  </Button>
-                </Link>
+            {recentReports.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <motion.div
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[hsl(var(--muted))] to-[hsl(var(--muted)/0.5)] flex items-center justify-center mb-4"
+                >
+                  <FileText className="w-10 h-10 text-[hsl(var(--muted-foreground)/0.5)]" />
+                </motion.div>
+                <h3 className="text-lg font-medium text-[hsl(var(--foreground))] mb-2">No analysis yet</h3>
+                <p className="text-[hsl(var(--muted-foreground))] mb-6 max-w-sm">
+                  Upload a prescription or medical image to get started with AI-powered analysis.
+                </p>
+                <div className="flex gap-3">
+                  <Link href="/diagnosis/prescription">
+                    <Button className="gap-2">
+                      <FileText className="w-4 h-4" />
+                      Analyze Prescription
+                    </Button>
+                  </Link>
+                  <Link href="/diagnosis/xray">
+                    <Button variant="outline" className="gap-2">
+                      <ScanLine className="w-4 h-4" />
+                      Analyze X-Ray
+                    </Button>
+                  </Link>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="space-y-3">
+                {recentReports.map((report, i) => {
+                  const cfg = typeConfig[report.type] || typeConfig.text;
+                  const ReportIcon = cfg.icon;
+                  const date = safeDate(report.createdAt);
+                  const statusDot = report.status === "completed" ? "bg-emerald-500" : report.status === "pending" ? "bg-amber-500" : "bg-red-500";
+
+                  return (
+                    <motion.button
+                      key={report.id}
+                      initial={{ opacity: 0, x: -12 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.5 + i * 0.06 }}
+                      onClick={() => {
+                        setCurrentReport(report);
+                        router.push(cfg.route);
+                      }}
+                      className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-[hsl(var(--muted)/0.4)] transition-colors group text-left"
+                    >
+                      <div className={`w-10 h-10 rounded-xl ${cfg.bg} flex items-center justify-center shrink-0`}>
+                        <ReportIcon className={`w-5 h-5 ${cfg.color}`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-[hsl(var(--foreground))] truncate">{report.title}</p>
+                        <p className="text-xs text-[hsl(var(--muted-foreground))] flex items-center gap-2 mt-0.5">
+                          <span className={`w-1.5 h-1.5 rounded-full ${statusDot}`} />
+                          {report.status}
+                          <span className="text-[hsl(var(--border))]">·</span>
+                          <Clock className="w-3 h-3" />
+                          {date.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                        </p>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-[hsl(var(--muted-foreground))] opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                    </motion.button>
+                  );
+                })}
+              </div>
+            )}
           </motion.div>
 
           {/* Analytics Preview */}
@@ -458,14 +501,21 @@ function AuthenticatedDashboard({ userName }: { userName?: string }) {
           >
             <Link href="/analytics" className="block h-full">
               <div className="group bg-[hsl(var(--card))] border border-[hsl(var(--border))] rounded-2xl p-6 h-full hover:border-[hsl(var(--brand-primary)/0.3)] transition-colors">
-                <div className="flex items-center gap-2 mb-4">
-                  <BarChart3 className="w-5 h-5 text-[hsl(var(--brand-primary))]" />
-                  <h2 className="text-lg font-semibold text-[hsl(var(--foreground))]">Analytics</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-[hsl(var(--brand-primary))]" />
+                    <h2 className="text-lg font-semibold text-[hsl(var(--foreground))]">Analytics</h2>
+                  </div>
+                  {reports.length > 0 && (
+                    <span className="text-xs font-medium px-2 py-1 rounded-md bg-[hsl(var(--brand-primary)/0.1)] text-[hsl(var(--brand-primary))]">
+                      {analytics.totalReportsAnalyzed} reports
+                    </span>
+                  )}
                 </div>
 
-                {/* Mini chart */}
+                {/* Mini chart - real data or placeholder */}
                 <div className="flex items-end justify-between h-32 mb-4 px-2">
-                  {[40, 65, 45, 80, 55, 90, 70].map((height, i) => (
+                  {chartBars.map((height, i) => (
                     <motion.div
                       key={i}
                       initial={{ height: 0 }}
@@ -479,10 +529,23 @@ function AuthenticatedDashboard({ userName }: { userName?: string }) {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-[hsl(var(--muted-foreground))]">Weekly trend</span>
-                    <span className="text-emerald-500 flex items-center gap-1">
-                      <TrendingUp className="w-4 h-4" /> +23%
-                    </span>
+                    {weeklyTrend !== null ? (
+                      <span className={`flex items-center gap-1 ${weeklyTrend >= 0 ? "text-emerald-500" : "text-red-400"}`}>
+                        <TrendingUp className={`w-4 h-4 ${weeklyTrend < 0 ? "rotate-180" : ""}`} />
+                        {weeklyTrend >= 0 ? "+" : ""}{weeklyTrend}%
+                      </span>
+                    ) : (
+                      <span className="text-[hsl(var(--muted-foreground))]">No data</span>
+                    )}
                   </div>
+                  {reports.length > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[hsl(var(--muted-foreground))]">Avg. confidence</span>
+                      <span className="text-[hsl(var(--foreground))] font-medium">
+                        {analytics.accuracyMetrics.averageConfidence > 0 ? `${Math.round(analytics.accuracyMetrics.averageConfidence * 100)}%` : "—"}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-[hsl(var(--border))]">
@@ -518,7 +581,7 @@ function AuthenticatedDashboard({ userName }: { userName?: string }) {
 }
 
 // ============================================
-// MAIN LANDING PAGE
+// LANDING PAGE CONTENT (for non-authenticated users)
 // ============================================
 export default function HomePage() {
   const { isAuthenticated, user } = useAuth();
@@ -1052,4 +1115,18 @@ export default function HomePage() {
       <div className="h-20" />
     </div>
   );
+}
+
+// ============================================
+// MAIN LANDING PAGE
+// ============================================
+export default function HomePage() {
+  const { isAuthenticated, user, isGuest } = useAuth();
+
+  // Show dashboard for authenticated users OR guests
+  if (isAuthenticated || isGuest) {
+    return <AuthenticatedDashboard userName={user?.displayName || user?.firstName} isGuest={isGuest} />;
+  }
+
+  return <LandingPageContent />;
 }

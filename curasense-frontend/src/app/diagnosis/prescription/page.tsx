@@ -73,6 +73,7 @@ export default function PrescriptionPage() {
 
   const { addReport } = useAppStore();
   const { announce } = useAnnounce();
+  const { accessToken } = useAuth();
 
   // Announce status changes for screen readers
   useEffect(() => {
@@ -128,15 +129,13 @@ export default function PrescriptionPage() {
         setUploadStatus("success");
         setAnalysisComplete(true);
         
-        const newReport = {
-          id: generateThreadId(),
-          type: "prescription" as const,
+        saveReport({
+          type: "prescription",
           title: selectedFile.name,
           summary: "Medical document analysis",
           content: response.report,
-          status: "completed" as const,
-        };
-        addReport(newReport);
+          status: "completed",
+        }, accessToken);
         
         toast.success("Analysis complete!", { id: toastId });
       } else {
@@ -176,15 +175,13 @@ export default function PrescriptionPage() {
         setReport(response.report);
         setAnalysisComplete(true);
         
-        const newReport = {
-          id: generateThreadId(),
-          type: "text" as const,
+        saveReport({
+          type: "text",
           title: "Manual Entry Analysis",
           summary: "Text-based medical analysis",
           content: response.report,
-          status: "completed" as const,
-        };
-        addReport(newReport);
+          status: "completed",
+        }, accessToken);
         
         toast.success("Analysis complete!", { id: toastId });
       } else {

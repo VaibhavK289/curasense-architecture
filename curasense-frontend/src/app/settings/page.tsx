@@ -61,6 +61,7 @@ import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { useAppStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { springPresets } from "@/styles/tokens/animations";
 
 interface UserSettings {
   notifications: boolean;
@@ -151,18 +152,23 @@ export default function SettingsPage() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="container max-w-4xl mx-auto py-6 px-4"
-    >
-      {/* Header */}
-      <div className="mb-10">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-cyan-500 shadow-lg shadow-teal-500/30">
-            <Settings className="h-6 w-6 text-white" />
-          </div>
+    <div className="min-h-screen bg-[hsl(var(--background))] relative overflow-hidden">
+      {/* Decorative background shapes */}
+      <div className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-[hsl(var(--brand-primary)/0.06)] blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-[hsl(var(--brand-secondary)/0.06)] blur-3xl" />
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={springPresets.smooth}
+        className="container max-w-4xl mx-auto py-6 px-4 relative z-10"
+      >
+        {/* Header */}
+        <div className="mb-10">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[hsl(var(--brand-primary))] to-[hsl(var(--brand-secondary))] shadow-lg shadow-[hsl(var(--brand-primary)/0.3)]">
+              <Settings className="h-6 w-6 text-white" />
+            </div>
           <div>
             <h1 className="text-3xl font-bold">
               <GradientText>Settings</GradientText>
@@ -646,5 +652,6 @@ export default function SettingsPage() {
         </div>
       </div>
     </motion.div>
+    </div>
   );
 }

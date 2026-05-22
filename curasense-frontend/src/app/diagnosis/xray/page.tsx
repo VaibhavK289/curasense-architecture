@@ -34,6 +34,8 @@ import { GradientText, SpotlightCard } from "@/components/ui/aceternity";
 import { useAppStore } from "@/lib/store";
 import { uploadXrayImage, queryXrayImage, getXrayAnswer } from "@/lib/api";
 import { generateThreadId, cn } from "@/lib/utils";
+import { saveReport } from "@/lib/save-report";
+import { useAuth } from "@/lib/auth-context";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -56,6 +58,7 @@ export default function XRayPage() {
   const chatScrollRef = useRef<HTMLDivElement>(null);
 
   const { addReport } = useAppStore();
+  const { accessToken } = useAuth();
 
   const handleImageSelect = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -141,14 +144,13 @@ export default function XRayPage() {
 
       setReport(answer);
       
-      const newReport = {
-        type: "xray" as const,
+      saveReport({
+        type: "xray",
         title: selectedImage.name,
         summary: "Medical image analysis",
         content: answer,
-        status: "completed" as const,
-      };
-      addReport(newReport);
+        status: "completed",
+      }, accessToken);
 
       toast.success("Analysis complete!", { id: "xray-upload" });
     } catch (err: unknown) {

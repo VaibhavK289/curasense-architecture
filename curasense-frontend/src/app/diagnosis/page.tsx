@@ -51,10 +51,16 @@ const diagnosisOptions = [
 
 export default function DiagnosisPage() {
   return (
+    <div className="min-h-screen bg-[hsl(var(--background))] relative overflow-hidden">
+      {/* Decorative background shapes */}
+      <div className="pointer-events-none absolute -top-24 -right-24 h-96 w-96 rounded-full bg-[hsl(var(--brand-primary)/0.06)] blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-[hsl(var(--brand-secondary)/0.06)] blur-3xl" />
+
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={springPresets.smooth}
+      className="container max-w-5xl mx-auto py-6 px-4 sm:px-6 relative z-10"
     >
       {/* Header */}
       <div className="mb-12">
@@ -148,5 +154,6 @@ export default function DiagnosisPage() {
         </Card>
       </motion.div>
     </motion.div>
+    </div>
   );
 }
